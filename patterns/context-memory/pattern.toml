@@ -1,0 +1,122 @@
+id = "context-memory"
+order = 5
+title = "Context and memory management"
+tagline = "What the model sees on each call as the task outgrows the window."
+experiment = "memory"
+research = ["anthropic-context", "chroma-context-rot", "packer2023memgpt", "park2023generative"]
+problem = """
+An agent's transcript grows with every step, each model call re-reads it, and both cost and error rate rise with length. Dropping history saves tokens but the agent may then need a value it no longer has, or lose track of what it has already done. The policy decides what stays visible, what is condensed and what is kept outside the context.
+"""
+applications = ["Long-running agents (dozens to hundreds of tool calls)", "Chat agents with long sessions", "Any loop where input tokens dominate cost"]
+decision = """
+Use full history until it hurts. Prefer a structured ledger when tool outputs are structured, because it costs no model calls and loses nothing you chose to keep. Use compaction for free-text histories. Treat a bare sliding window as a last resort: if a dependency reaches further back than the window, the agent pays to re-derive it or stalls.
+"""
+
+[[solutions]]
+id = "full"
+name = "Full history"
+status = "implemented"
+summary = "Send everything every time."
+implementation = "src/agentlab/memory/context.py"
+example = "examples/09_context_memory.py"
+tests = "tests/test_memory.py"
+result_arch = ["full"]
+advantages = ["Nothing is ever forgotten", "Stable prefix: ideal for prompt caching on real APIs"]
+limitations = ["Quadratic total tokens", "Eventually exceeds the window", "Long contexts degrade recall in real models"]
+performance = "Measured: {{memory|15 steps|full|total_tokens_mean|k}} tokens at 15 steps, {{memory|57 steps|full|total_tokens_mean|k}} at 57; peak context {{memory|57 steps|full|peak_context_mean|0}}."
+complexity = "None."
+reliability = "No forgetting failures."
+security = "Untrusted content, once read, stays in context for the rest of the run."
+use_when = ["Short and medium tasks", "Prompt caching makes re-reading cheap"]
+avoid_when = ["Runs that approach the context window"]
+frameworks = "Default everywhere."
+
+[[solutions]]
+id = "window"
+name = "Sliding window"
+status = "implemented"
+summary = "Keep the goal and the last N messages."
+implementation = "src/agentlab/memory/context.py"
+example = "examples/09_context_memory.py"
+tests = "tests/test_memory.py"
+result_arch = ["window-6", "window-16", "window-32"]
+diagram = '''
+flowchart LR
+  H[Full history] --> P[Pinned goal]
+  H --> W[Last N messages]
+  H -.evicted.-> X[Older messages]
+  P --> V[Model view]
+  W --> V
+'''
+advantages = ["Hard bound on context size", "No extra model calls"]
+limitations = ["Evicted values must be re-fetched, which costs model calls", "If a dependency spans more than the window the agent can livelock", "Evicting side-effect records risks repeating them"]
+performance = "Measured at 57 steps: window-16 used {{memory|57 steps|window-16|total_tokens_mean|k}} tokens and {{memory|57 steps|window-16|tool_calls_mean|0}} tool calls; window-32 {{memory|57 steps|window-32|total_tokens_mean|k}} tokens; full history {{memory|57 steps|full|total_tokens_mean|k}} tokens and {{memory|57 steps|full|tool_calls_mean|0}} tool calls."
+complexity = "A slice."
+reliability = "Measured: window-6 completed {{memory|15 steps|window-6|success_rate|%}} of tasks at every length (it ran to the iteration cap); window-16 completed {{memory|57 steps|window-16|success_rate|%}}."
+security = "Evicts untrusted content along with everything else."
+use_when = ["Chat-like interactions where old turns truly stop mattering"]
+avoid_when = ["Tasks with long-range dependencies", "Tasks with non-idempotent effects"]
+frameworks = "LangChain message trimming; OpenAI Agents SDK session history limits."
+
+[[solutions]]
+id = "compaction"
+name = "Compaction (summarise and continue)"
+status = "implemented"
+summary = "When the context passes a threshold, replace older messages with a model-written summary and keep the most recent ones verbatim."
+implementation = "src/agentlab/memory/context.py"
+example = "examples/09_context_memory.py"
+tests = "tests/test_memory.py"
+result_arch = ["compaction-600"]
+diagram = '''
+flowchart LR
+  H[History grows] -->|over threshold| S[Model: summarise older part]
+  S --> M[Summary message]
+  M --> V[Goal + summary + recent messages]
+'''
+advantages = ["Bounds context without re-fetching", "Works on free-text histories"]
+limitations = ["Extra model calls to summarise", "Summaries lose detail in ways that are hard to predict", "Rewrites the prefix, which invalidates prompt caches"]
+performance = "Measured at 57 steps: {{memory|57 steps|compaction-600|total_tokens_mean|k}} tokens, peak context {{memory|57 steps|compaction-600|peak_context_mean|0}}, {{memory|57 steps|compaction-600|model_calls_mean|0}} model calls (full history: {{memory|57 steps|full|model_calls_mean|0}})."
+complexity = "A threshold, a cut point and a summarise call."
+reliability = "{{memory|57 steps|compaction-600|success_rate|%}} success here with a lossless simulated summariser; real summarisers will do worse."
+security = "A summary is model output derived from possibly untrusted text: it can carry an injection forward in condensed form."
+use_when = ["Long conversational or free-text runs", "No structured state to fall back on"]
+avoid_when = ["Exact values from early steps are needed later and are not in a ledger"]
+integration = """
+```python
+from agentlab.memory.context import Compaction
+ReActLoop(rt, memory=Compaction(max_tokens=600, keep_recent=4)).run(goal)
+```
+The model must answer a `summarize` request.
+"""
+frameworks = "Claude API server-side compaction; Claude Code auto-compact; LangGraph summarisation nodes."
+
+[[solutions]]
+id = "ledger"
+name = "Structured fact ledger"
+status = "implemented"
+summary = "The runtime copies each tool result into a keyed ledger outside the transcript and shows the model the ledger plus the last few messages."
+implementation = "src/agentlab/memory/context.py"
+example = "examples/09_context_memory.py"
+tests = "tests/test_memory.py"
+result_arch = ["ledger"]
+diagram = '''
+flowchart LR
+  T[Tool result] -->|runtime writes| L[(Ledger: step -> value)]
+  L --> V[Goal + ledger + last few messages]
+  V --> M[Model]
+'''
+advantages = ["No model calls", "Exact values are preserved", "Smallest context"]
+limitations = ["Needs structured tool outputs or a note-taking tool", "Reasoning that was only in prose is gone"]
+performance = "Measured at 57 steps: {{memory|57 steps|ledger|total_tokens_mean|k}} tokens, peak context {{memory|57 steps|ledger|peak_context_mean|0}}, no additional model calls."
+complexity = "A dictionary updated per tool result."
+reliability = "{{memory|57 steps|ledger|success_rate|%}} success at every length tested."
+security = "Only values enter the ledger; free-text notes attached to tool output do not persist."
+use_when = ["Tool outputs are structured", "The task is a pipeline of values"]
+avoid_when = ["The valuable content is unstructured reasoning"]
+integration = """
+```python
+from agentlab.memory.context import FactLedger
+ReActLoop(rt, memory=FactLedger(keep_recent=2)).run(goal)
+```
+"""
+frameworks = "LangGraph state channels; structured note-taking and memory tools; plan variables in ReWOO."

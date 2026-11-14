@@ -1,0 +1,88 @@
+{
+ "columns": [
+  {
+   "key": "arch",
+   "label": "Loop"
+  },
+  {
+   "key": "events",
+   "label": "Events"
+  },
+  {
+   "key": "jsonl_bytes",
+   "label": "Event log bytes"
+  },
+  {
+   "key": "spans",
+   "label": "Spans"
+  },
+  {
+   "key": "span_bytes",
+   "label": "Span tree bytes"
+  },
+  {
+   "key": "replay_identical",
+   "label": "Replay identical"
+  }
+ ],
+ "conditions": {
+  "replay": "ReplayModel + ReplayTools serve recorded results; request fingerprints must match",
+  "tasks": 50
+ },
+ "findings": [
+  "A flat event log costs 17420 bytes per ReAct run (36 events); the derived span tree is 10958 bytes (35 spans).",
+  "Replay from the recorded tape reproduced the complete event stream (payloads and timestamps) exactly in 100% of runs at worst, across all three loops, with zero backend calls.",
+  "The trace is dominated by model-call payloads; plan-and-execute traces are smallest because they contain the fewest model calls (14984 bytes vs 17420)."
+ ],
+ "group_by": [
+  "scenario"
+ ],
+ "id": "tracing",
+ "limitations": [
+  "Events store full model responses but only a fingerprint of each request; reconstructing prompts requires replaying.",
+  "Span timing uses the simulated clock."
+ ],
+ "question": "What does it cost to record a run, and can a recorded run be replayed exactly?",
+ "rows": [
+  {
+   "arch": "react",
+   "backend_calls_during_replay": 0.0,
+   "events": 36.36,
+   "jsonl_bytes": 17419.84,
+   "model_calls": 17.68,
+   "n": 50,
+   "replay_identical": 1.0,
+   "scenario": "15-step tasks, 8% slips, 1 relocated key",
+   "span_bytes": 10958.1,
+   "spans": 35.36,
+   "tool_calls": 16.68
+  },
+  {
+   "arch": "plan_execute",
+   "backend_calls_during_replay": 0.0,
+   "events": 22.36,
+   "jsonl_bytes": 14983.74,
+   "model_calls": 3.68,
+   "n": 50,
+   "replay_identical": 1.0,
+   "scenario": "15-step tasks, 8% slips, 1 relocated key",
+   "span_bytes": 6009.04,
+   "spans": 21.36,
+   "tool_calls": 16.68
+  },
+  {
+   "arch": "verified_graph",
+   "backend_calls_during_replay": 0.0,
+   "events": 74.52,
+   "jsonl_bytes": 24247.12,
+   "model_calls": 9.14,
+   "n": 50,
+   "replay_identical": 1.0,
+   "scenario": "15-step tasks, 8% slips, 1 relocated key",
+   "span_bytes": 8166.18,
+   "spans": 27.62,
+   "tool_calls": 17.48
+  }
+ ],
+ "title": "Tracing and replay"
+}

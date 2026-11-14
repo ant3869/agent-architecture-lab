@@ -1,0 +1,101 @@
+id = "tracing-replay"
+order = 9
+title = "Execution tracing, observability and replay"
+tagline = "Recording what an agent did well enough to explain it and to run it again."
+experiment = "tracing"
+research = ["otel-genai-agent-spans", "openai-agents-tracing", "langgraph-persistence", "temporal-workflow-execution"]
+problem = """
+Agent runs are long, branching and non-deterministic. When one goes wrong you need to know what the model saw, what it did and how long each part took, and ideally to re-run the exact sequence against changed code. Different consumers want different shapes: a log to grep, a span tree for a tracing backend, and a tape to replay.
+"""
+applications = ["Debugging failed runs", "Cost and latency attribution", "Regression tests built from recorded production runs"]
+decision = """
+Emit one structured event stream from the single place where models and tools are called, then derive the other views from it. Do not instrument each architecture separately.
+"""
+
+[[solutions]]
+id = "event-log"
+name = "Flat event log"
+status = "implemented"
+summary = "Append one JSON object per model call, tool result, message and state transition."
+implementation = "src/agentlab/core/trace.py"
+example = "examples/11_trace_and_replay.py"
+tests = "tests/test_tracing.py"
+result_arch = ["react", "plan_execute", "verified_graph"]
+advantages = ["Simple, greppable, diffable", "The system of record for the other two views"]
+limitations = ["No hierarchy or durations without post-processing", "Payloads are large"]
+performance = "Measured: {{tracing|*|react|events|0}} events and {{tracing|*|react|jsonl_bytes|k}} bytes per ReAct run of 15 steps."
+use_when = ["Always"]
+avoid_when = ["Never; restrict payloads if they hold sensitive data"]
+integration = """
+```python
+from agentlab.core.trace import Tracer
+tracer = Tracer(clock)
+rt = Runtime(model, tools, clock=clock, tracer=tracer)
+...
+tracer.write_jsonl("run.jsonl")
+```
+"""
+frameworks = "Structured logging; LangSmith runs; OpenAI Agents SDK trace events."
+
+[[solutions]]
+id = "spans"
+name = "Span tree (OpenTelemetry-shaped)"
+status = "implemented"
+summary = "Fold events into parent/child spans with start, end, status and GenAI attribute names."
+implementation = "src/agentlab/core/trace.py"
+example = "examples/11_trace_and_replay.py"
+tests = "tests/test_tracing.py"
+result_arch = ["react", "plan_execute", "verified_graph"]
+diagram = '''
+flowchart TB
+  R[react.run] --> C1[chat sim-base]
+  R --> T1[execute_tool lookup]
+  R --> C2[chat sim-base]
+  R --> T2[execute_tool send]
+'''
+advantages = ["Plugs into existing tracing backends", "Shows where time and tokens went"]
+limitations = ["GenAI semantic conventions are still in development and may change", "Sampling can drop the run you need"]
+performance = "Measured: {{tracing|*|react|spans|0}} spans, {{tracing|*|react|span_bytes|k}} bytes per run."
+use_when = ["You already operate a tracing backend"]
+avoid_when = ["As the only record; spans are a lossy projection"]
+integration = """
+```python
+from agentlab.core.trace import build_spans
+spans = build_spans(tracer.events)     # dicts with trace_id, span_id, parent_span_id, attributes
+```
+Map these onto your OpenTelemetry SDK's span API to export them.
+"""
+frameworks = "OpenTelemetry GenAI semantic conventions; Agents SDK trace processors."
+
+[[solutions]]
+id = "replay"
+name = "Record/replay tape"
+status = "implemented"
+summary = "Serve recorded model responses and tool results back to the same code, checking that each request matches the recording."
+implementation = "src/agentlab/core/trace.py"
+example = "examples/11_trace_and_replay.py"
+tests = "tests/test_tracing.py"
+result_arch = ["react", "plan_execute", "verified_graph"]
+diagram = '''
+flowchart LR
+  E[Recorded events] --> TP[Tape]
+  TP --> RM[ReplayModel]
+  TP --> RT[ReplayTools]
+  RM --> L[Same loop code]
+  RT --> L
+  L -->|request differs from recording| X[ReplayDivergence]
+'''
+advantages = ["Deterministic reproduction with no model or backend", "Turns a production run into a regression test", "Detects behavioural change in the loop"]
+limitations = ["Only replays the recorded path; cannot answer what-if questions that change a request", "Requires deterministic loop code"]
+reliability = "Measured: replay reproduced the full event stream, including timestamps, in {{tracing|*|react|replay_identical|%}} of recorded runs for every loop."
+use_when = ["Debugging", "Regression suites", "Cost-free CI for agent code"]
+avoid_when = ["Evaluating a prompt or model change (the recording no longer applies)"]
+integration = """
+```python
+from agentlab.core.trace import Tape, ReplayModel, ReplayTools, read_jsonl
+tape = Tape(read_jsonl("run.jsonl"))
+rt = Runtime(ReplayModel(tape), ReplayTools(tape, specs, clock), clock=clock)
+ReActLoop(rt).run(goal)
+```
+"""
+frameworks = "VCR-style HTTP recording; Temporal replay; LangGraph time travel."

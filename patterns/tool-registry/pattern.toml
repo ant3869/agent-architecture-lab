@@ -1,0 +1,101 @@
+id = "tool-registry"
+order = 4
+title = "Tool registries and capability routing"
+tagline = "Which tools the model sees, and what reaches the backend."
+experiment = "tools"
+research = ["gan2025ragmcp", "qin2023toolllm", "anthropic-advanced-tools", "mcp-tools", "mcp-changelog-2025-11-25"]
+problem = """
+Tool catalogues grow. Every schema shown to the model costs tokens on every call and widens what a confused or manipulated model can do, while a schema it cannot see is a tool it cannot use. The registry decides what is exposed, when, and whether a malformed call is stopped before it reaches a real system.
+"""
+applications = ["Agents connected to several MCP servers", "Internal platforms exposing dozens of APIs to one assistant", "Per-agent tool scoping in multi-agent systems"]
+decision = """
+With a handful of tools, expose them all. Once a catalogue reaches dozens, scope by capability if you know what the task needs up front, and load lazily if you do not. Validate arguments against the schema before execution in every case: it is cheap and keeps malformed calls out of your systems.
+"""
+
+[[solutions]]
+id = "static"
+name = "Static registry"
+status = "implemented"
+summary = "Every tool is always exposed. Calls go straight to the backend."
+implementation = "src/agentlab/tools/registry.py"
+example = "examples/08_tool_registries.py"
+tests = "tests/test_tools.py"
+result_arch = ["static"]
+diagram = '''
+flowchart LR
+  M[Model] -->|sees all N schemas every call| R[Static registry]
+  R --> B[(Backends)]
+'''
+advantages = ["Nothing to configure; no discovery step", "The model can always reach every tool"]
+limitations = ["Prompt cost scales with catalogue size times model calls", "Malformed calls reach the backend", "No least privilege"]
+performance = "Measured with 39 tools: {{tools|perfect model|static|prompt_tokens_mean|k}} prompt tokens per 15-step task."
+complexity = "A dictionary."
+reliability = "With 10% malformed calls, {{tools|loud slips 10%|static|backend_errors_mean|2}} bad calls per task reached the backend."
+security = "Everything is callable by a manipulated model."
+use_when = ["Small, stable tool sets"]
+avoid_when = ["Catalogues of dozens of tools", "Backends that should never see malformed input"]
+frameworks = "The default in most SDKs."
+
+[[solutions]]
+id = "scoped"
+name = "Capability-scoped registry with schema validation"
+status = "implemented"
+summary = "Expose only tools in the capability domains granted to this agent or task; reject calls that violate the schema before execution. Scopes can only narrow."
+implementation = "src/agentlab/tools/registry.py"
+example = "examples/08_tool_registries.py"
+tests = "tests/test_tools.py"
+result_arch = ["scoped"]
+diagram = '''
+flowchart LR
+  M[Model] -->|sees tools in granted domains| S[Scoped registry]
+  S -->|unknown tool or schema violation| E[error result back to model]
+  S -->|valid| B[(Backends)]
+'''
+advantages = ["Cuts prompt tokens to the tools that matter", "Least privilege per agent; a narrowed scope cannot be widened", "Schema violations return to the model as correctable errors without touching the backend"]
+limitations = ["Someone must know the needed capabilities in advance", "A tool outside the scope is unreachable even when it would have helped"]
+performance = "Measured: {{tools|perfect model|scoped|prompt_tokens_mean|k}} prompt tokens per task against {{tools|perfect model|static|prompt_tokens_mean|k}} static."
+complexity = "Domain tags on tools plus a validator."
+reliability = "With 10% malformed calls, {{tools|loud slips 10%|scoped|rejected_pre_execution_mean|2}} per task were rejected before execution and {{tools|loud slips 10%|scoped|backend_errors_mean|2}} reached the backend (semantic errors a schema cannot express)."
+security = "The structural basis for per-worker privilege separation in the supervisor pattern."
+use_when = ["Known task types", "Multi-agent systems with specialist roles", "Any backend that must be shielded from malformed calls"]
+avoid_when = ["Open-ended assistants that may need anything"]
+integration = """
+```python
+from agentlab.tools.registry import ScopedRegistry
+registry = ScopedRegistry(all_tools, domains=["data", "math", "ops"])
+worker_view = registry.scope(["math"])     # can only shrink
+```
+"""
+frameworks = "OpenAI Agents SDK per-agent tools; MCP server allowlists; LangGraph tool nodes per subgraph."
+
+[[solutions]]
+id = "lazy"
+name = "Lazy discovery (tool search)"
+status = "implemented"
+summary = "Expose one search tool. The model asks for a capability; matching schemas are loaded into context for the rest of the run."
+implementation = "src/agentlab/tools/registry.py"
+example = "examples/08_tool_registries.py"
+tests = "tests/test_tools.py"
+result_arch = ["lazy"]
+diagram = '''
+flowchart LR
+  M[Model] -->|search_tools: data| L[Lazy registry]
+  L -->|loads matching schemas| M
+  M -->|call loaded tool| L
+  L --> B[(Backends)]
+'''
+advantages = ["Scales to catalogues too large to show", "No up-front knowledge of what the task needs"]
+limitations = ["One extra model call per capability discovered", "Depends on search quality; a missed tool is an invisible tool", "Changing the tool list mid-run invalidates prompt caches on real APIs"]
+performance = "Measured: {{tools|perfect model|lazy|prompt_tokens_mean|k}} prompt tokens per task and {{tools|perfect model|lazy|model_calls_mean|0}} model calls (static: {{tools|perfect model|static|model_calls_mean|0}})."
+complexity = "A search function and a loaded-set."
+reliability = "A tool that is not loaded returns a clear error telling the model to search."
+security = "Smaller standing exposure than static, but any tool in the catalogue is one search away."
+use_when = ["Very large or changing catalogues", "General assistants"]
+avoid_when = ["Few tools", "Latency-critical short tasks"]
+integration = """
+```python
+from agentlab.tools.registry import LazyRegistry
+registry = LazyRegistry(all_tools, preload=["lookup"], top_k=4)
+```
+"""
+frameworks = "Anthropic tool search tool (defer_loading); RAG-MCP; MCP tool-list change notifications."

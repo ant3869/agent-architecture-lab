@@ -1,0 +1,672 @@
+{
+ "description": "One key has moved and the model slips once. Each error is simply the next observation.",
+ "events": [
+  {
+   "agent": "agent",
+   "data": {
+    "name": "react.run",
+    "parent": ""
+   },
+   "kind": "span_start",
+   "seq": 0,
+   "span": "sp1",
+   "t_ms": 0
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "aacb9948287b0ce8",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t8-1x3m1:st1:item1"
+      },
+      "idem_key": "",
+      "step_id": "s1",
+      "tool": "lookup"
+     },
+     "completion_tokens": 24,
+     "cost": 0.272,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 152,
+     "replayed": false,
+     "text": "Thought: look up inv:t8-1x3m1:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t8-1x3m1:st1:item1\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 1,
+   "span": "sp1",
+   "t_ms": 800
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t8-1x3m1:st1:item1"
+     },
+     "idem_key": "",
+     "step_id": "s1",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "inv:t8-1x3m1:st1:item1 moved to inv:t8-1x3m1:st1:item1.v2",
+     "error_code": "MOVED",
+     "info": {
+      "moved_to": "inv:t8-1x3m1:st1:item1.v2"
+     },
+     "note": "",
+     "ok": false,
+     "output": null,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 2,
+   "span": "sp1",
+   "t_ms": 840
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "a15a8a12d2b1c8ef",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t8-1x3m1:st1:item1.v2"
+      },
+      "idem_key": "",
+      "step_id": "s1",
+      "tool": "lookup"
+     },
+     "completion_tokens": 25,
+     "cost": 0.325,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 200,
+     "replayed": false,
+     "text": "Thought: look up inv:t8-1x3m1:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t8-1x3m1:st1:item1.v2\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 3,
+   "span": "sp1",
+   "t_ms": 1640
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t8-1x3m1:st1:item1.v2"
+     },
+     "idem_key": "",
+     "step_id": "s1",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 9,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 4,
+   "span": "sp1",
+   "t_ms": 1680
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "09741091d0fee8cb",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t8-1x3m1:st1:item2"
+      },
+      "idem_key": "",
+      "step_id": "s2",
+      "tool": "lookup"
+     },
+     "completion_tokens": 24,
+     "cost": 0.352,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 232,
+     "replayed": false,
+     "text": "Thought: look up inv:t8-1x3m1:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t8-1x3m1:st1:item2\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 5,
+   "span": "sp1",
+   "t_ms": 2480
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t8-1x3m1:st1:item2"
+     },
+     "idem_key": "",
+     "step_id": "s2",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 3,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 6,
+   "span": "sp1",
+   "t_ms": 2520
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "b4215468389f22af",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t8-1x3m1:st1:item3"
+      },
+      "idem_key": "",
+      "step_id": "s3",
+      "tool": "lookup"
+     },
+     "completion_tokens": 24,
+     "cost": 0.383,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 263,
+     "replayed": false,
+     "text": "Thought: look up inv:t8-1x3m1:st1:item3 [s3]\nAction: lookup({\"key\": \"inv:t8-1x3m1:st1:item3\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 7,
+   "span": "sp1",
+   "t_ms": 3320
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t8-1x3m1:st1:item3"
+     },
+     "idem_key": "",
+     "step_id": "s3",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 6,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 8,
+   "span": "sp1",
+   "t_ms": 3360
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "7054b0d5b498bbc9",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "a": 9,
+       "b": 3,
+       "op": "add"
+      },
+      "idem_key": "",
+      "step_id": "s4",
+      "tool": "compute"
+     },
+     "completion_tokens": 19,
+     "cost": 0.389,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 294,
+     "replayed": false,
+     "text": "Thought: add s1 and s2 [s4]\nAction: compute({\"a\": 9, \"b\": 3, \"op\": \"add\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 9,
+   "span": "sp1",
+   "t_ms": 4160
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "a": 9,
+      "b": 3,
+      "op": "add"
+     },
+     "idem_key": "",
+     "step_id": "s4",
+     "tool": "compute"
+    },
+    "duration_ms": 5,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 12,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 10,
+   "span": "sp1",
+   "t_ms": 4165
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "e660c7ba864d33a6",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "a": 12,
+       "b": 6,
+       "op": "pow"
+      },
+      "idem_key": "",
+      "step_id": "s5",
+      "tool": "compute"
+     },
+     "completion_tokens": 19,
+     "cost": 0.416,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 321,
+     "replayed": false,
+     "text": "Thought: add s4 and s3 [s5]\nAction: compute({\"a\": 12, \"b\": 6, \"op\": \"pow\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 11,
+   "span": "sp1",
+   "t_ms": 4965
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "a": 12,
+      "b": 6,
+      "op": "pow"
+     },
+     "idem_key": "",
+     "step_id": "s5",
+     "tool": "compute"
+    },
+    "duration_ms": 5,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "unsupported op: pow",
+     "error_code": "INVALID_OP",
+     "info": {},
+     "note": "",
+     "ok": false,
+     "output": null,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 12,
+   "span": "sp1",
+   "t_ms": 4970
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "3505e74dbf2d69b6",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "a": 12,
+       "b": 6,
+       "op": "add"
+      },
+      "idem_key": "",
+      "step_id": "s5",
+      "tool": "compute"
+     },
+     "completion_tokens": 19,
+     "cost": 0.451,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 356,
+     "replayed": false,
+     "text": "Thought: add s4 and s3 [s5]\nAction: compute({\"a\": 12, \"b\": 6, \"op\": \"add\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 13,
+   "span": "sp1",
+   "t_ms": 5770
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "a": 12,
+      "b": 6,
+      "op": "add"
+     },
+     "idem_key": "",
+     "step_id": "s5",
+     "tool": "compute"
+    },
+    "duration_ms": 5,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 18,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 14,
+   "span": "sp1",
+   "t_ms": 5775
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "c545ef5f245c6834",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "report:t8-1x3m1:st1",
+       "value": 18
+      },
+      "idem_key": "",
+      "step_id": "s6",
+      "tool": "write"
+     },
+     "completion_tokens": 26,
+     "cost": 0.513,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 383,
+     "replayed": false,
+     "text": "Thought: write s5 to report:t8-1x3m1:st1 [s6]\nAction: write({\"key\": \"report:t8-1x3m1:st1\", \"value\": 18})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 15,
+   "span": "sp1",
+   "t_ms": 6575
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "report:t8-1x3m1:st1",
+      "value": 18
+     },
+     "idem_key": "",
+     "step_id": "s6",
+     "tool": "write"
+    },
+    "duration_ms": 60,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": "written",
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 16,
+   "span": "sp1",
+   "t_ms": 6635
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "e69860d8f2eb1d8b",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "body": 18,
+       "to": "ops"
+      },
+      "idem_key": "",
+      "step_id": "s7",
+      "tool": "send"
+     },
+     "completion_tokens": 18,
+     "cost": 0.508,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 418,
+     "replayed": false,
+     "text": "Thought: notify ops with s5 [s7]\nAction: send({\"body\": 18, \"to\": \"ops\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 17,
+   "span": "sp1",
+   "t_ms": 7435
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "body": 18,
+      "to": "ops"
+     },
+     "idem_key": "",
+     "step_id": "s7",
+     "tool": "send"
+    },
+    "duration_ms": 120,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": "sent",
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 18,
+   "span": "sp1",
+   "t_ms": 7555
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "mode": "act",
+    "request_fp": "a3eac461f1841727",
+    "response": {
+     "__t": "ModelResponse",
+     "call": null,
+     "completion_tokens": 5,
+     "cost": 0.469,
+     "data": {
+      "blocked": false
+     },
+     "final": true,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 444,
+     "replayed": false,
+     "text": "FINAL: task complete"
+    }
+   },
+   "kind": "model_call",
+   "seq": 19,
+   "span": "sp1",
+   "t_ms": 8355
+  },
+  {
+   "agent": "agent",
+   "data": {
+    "status": "ok"
+   },
+   "kind": "span_end",
+   "seq": 20,
+   "span": "sp1",
+   "t_ms": 8355
+  }
+ ],
+ "goal": "Task t8-1x3m1: (s1) look up inv:t8-1x3m1:st1:item1. (s2) look up inv:t8-1x3m1:st1:item2. (s3) look up inv:t8-1x3m1:st1:item3. (s4) add s1 and s2. (s5) add s4 and s3. (s6) write s5 to report:t8-1x3m1:st1. (s7) notify ops with s5.",
+ "id": "react-surprise",
+ "pattern": "execution-loops",
+ "solution": "react",
+ "summary": {
+  "backend_calls": 9,
+  "model_calls": 10,
+  "outcome": "ok",
+  "peak_context": 444,
+  "sim_ms": 8355,
+  "status": "final",
+  "steps": 7,
+  "tokens": 3266,
+  "tool_calls": 9
+ },
+ "title": "ReAct recovers from a relocated key and a malformed call"
+}

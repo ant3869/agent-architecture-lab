@@ -1,0 +1,16 @@
+{
+ "n": 200,
+ "digest": "34105f268e6c97ec31a56b1a4c3d2ee779ec8ef00cfe4d43d678d9292e0018cf",
+ "experiments": [
+  "loops",
+  "orchestration",
+  "durability",
+  "recovery",
+  "memory",
+  "routing",
+  "tools",
+  "permissions",
+  "tracing",
+  "complexity"
+ ]
+}

@@ -1,0 +1,325 @@
+{
+ "columns": [
+  {
+   "key": "arch",
+   "label": "Registry"
+  },
+  {
+   "key": "success_rate",
+   "label": "Success"
+  },
+  {
+   "key": "prompt_tokens_mean",
+   "label": "Prompt tokens"
+  },
+  {
+   "key": "model_calls_mean",
+   "label": "Model calls"
+  },
+  {
+   "key": "exposed_tools_mean",
+   "label": "Schemas exposed at end"
+  },
+  {
+   "key": "rejected_pre_execution_mean",
+   "label": "Rejected before backend"
+  },
+  {
+   "key": "backend_errors_mean",
+   "label": "Bad calls reaching backend"
+  }
+ ],
+ "conditions": {
+  "catalogue": "4 task tools + 35 distractors + (lazy only) search_tools",
+  "loop": "react",
+  "tasks_per_cell": 100
+ },
+ "findings": [
+  "Exposing all 40 schemas on every call costs 33440 prompt tokens per task; scoping to the task's three capability domains costs 7008 (-79%); lazy discovery costs 9433 (-72%).",
+  "Lazy discovery pays 3 extra model calls per task (one search per capability) and ends with 5 schemas loaded.",
+  "With 10% malformed calls, the static registry lets 1.81 bad calls per task reach the backend; schema validation in the scoped registry stops 1.70 per task before execution and 0.11 reach the backend."
+ ],
+ "group_by": [
+  "scenario"
+ ],
+ "id": "tools",
+ "limitations": [
+  "The simulated model never picks a wrong tool, so the accuracy cost of a crowded tool list (reported in RAG-MCP, arXiv:2505.03275) is not reproduced; only the token cost is measured.",
+  "Search is keyword matching over 40 tools. Retrieval quality at thousands of tools is a separate problem.",
+  "Prompt caching, which discounts repeated tool schemas on real APIs, is not modelled."
+ ],
+ "question": "What does it cost to show the model every tool, and what do scoping and lazy loading buy?",
+ "rows": [
+  {
+   "arch": "static",
+   "backend_calls_mean": 15.0,
+   "backend_calls_p95": 15.0,
+   "backend_errors_mean": 0.0,
+   "backend_errors_p95": 0.0,
+   "completion_tokens_mean": 338.58,
+   "completion_tokens_p95": 340.0,
+   "cost_mean": 35.133,
+   "cost_p95": 35.158,
+   "duplicate_effects_mean": 0.0,
+   "duplicate_effects_p95": 0.0,
+   "exposed_tools_mean": 39.0,
+   "exposed_tools_p95": 39.0,
+   "iterations_mean": 15.0,
+   "iterations_p95": 15.0,
+   "model_calls_mean": 16.0,
+   "model_calls_p95": 16.0,
+   "n": 100,
+   "peak_context_mean": 2316.92,
+   "peak_context_p95": 2319.0,
+   "prompt_tokens_mean": 33440.24,
+   "prompt_tokens_p95": 33458.0,
+   "reasons": {
+    "ok": 100
+   },
+   "rejected_pre_execution_mean": 0.0,
+   "rejected_pre_execution_p95": 0.0,
+   "repairs_mean": 0.0,
+   "repairs_p95": 0.0,
+   "replans_mean": 0.0,
+   "replans_p95": 0.0,
+   "scenario": "perfect model",
+   "sim_ms_mean": 13365.0,
+   "sim_ms_p95": 13365.0,
+   "success_ci95": [
+    0.963,
+    1.0
+   ],
+   "success_rate": 1.0,
+   "tool_calls_mean": 15.0,
+   "tool_calls_p95": 15.0,
+   "total_tokens_mean": 33778.82,
+   "total_tokens_p95": 33798.0
+  },
+  {
+   "arch": "scoped",
+   "backend_calls_mean": 15.0,
+   "backend_calls_p95": 15.0,
+   "backend_errors_mean": 0.0,
+   "backend_errors_p95": 0.0,
+   "completion_tokens_mean": 338.58,
+   "completion_tokens_p95": 340.0,
+   "cost_mean": 8.701,
+   "cost_p95": 8.726,
+   "duplicate_effects_mean": 0.0,
+   "duplicate_effects_p95": 0.0,
+   "exposed_tools_mean": 4.0,
+   "exposed_tools_p95": 4.0,
+   "iterations_mean": 15.0,
+   "iterations_p95": 15.0,
+   "model_calls_mean": 16.0,
+   "model_calls_p95": 16.0,
+   "n": 100,
+   "peak_context_mean": 664.92,
+   "peak_context_p95": 667.0,
+   "prompt_tokens_mean": 7008.24,
+   "prompt_tokens_p95": 7026.0,
+   "reasons": {
+    "ok": 100
+   },
+   "rejected_pre_execution_mean": 0.0,
+   "rejected_pre_execution_p95": 0.0,
+   "repairs_mean": 0.0,
+   "repairs_p95": 0.0,
+   "replans_mean": 0.0,
+   "replans_p95": 0.0,
+   "scenario": "perfect model",
+   "sim_ms_mean": 13365.0,
+   "sim_ms_p95": 13365.0,
+   "success_ci95": [
+    0.963,
+    1.0
+   ],
+   "success_rate": 1.0,
+   "tool_calls_mean": 15.0,
+   "tool_calls_p95": 15.0,
+   "total_tokens_mean": 7346.82,
+   "total_tokens_p95": 7366.0
+  },
+  {
+   "arch": "lazy",
+   "backend_calls_mean": 15.0,
+   "backend_calls_p95": 15.0,
+   "backend_errors_mean": 0.0,
+   "backend_errors_p95": 0.0,
+   "completion_tokens_mean": 406.58,
+   "completion_tokens_p95": 408.0,
+   "cost_mean": 11.466,
+   "cost_p95": 11.492,
+   "duplicate_effects_mean": 0.0,
+   "duplicate_effects_p95": 0.0,
+   "exposed_tools_mean": 5.0,
+   "exposed_tools_p95": 5.0,
+   "iterations_mean": 18.0,
+   "iterations_p95": 18.0,
+   "model_calls_mean": 19.0,
+   "model_calls_p95": 19.0,
+   "n": 100,
+   "peak_context_mean": 800.92,
+   "peak_context_p95": 803.0,
+   "prompt_tokens_mean": 9433.0,
+   "prompt_tokens_p95": 9452.0,
+   "reasons": {
+    "ok": 100
+   },
+   "rejected_pre_execution_mean": 0.0,
+   "rejected_pre_execution_p95": 0.0,
+   "repairs_mean": 0.0,
+   "repairs_p95": 0.0,
+   "replans_mean": 0.0,
+   "replans_p95": 0.0,
+   "scenario": "perfect model",
+   "sim_ms_mean": 15765.0,
+   "sim_ms_p95": 15765.0,
+   "success_ci95": [
+    0.963,
+    1.0
+   ],
+   "success_rate": 1.0,
+   "tool_calls_mean": 18.0,
+   "tool_calls_p95": 18.0,
+   "total_tokens_mean": 9839.58,
+   "total_tokens_p95": 9860.0
+  },
+  {
+   "arch": "static",
+   "backend_calls_mean": 16.81,
+   "backend_calls_p95": 19.0,
+   "backend_errors_mean": 1.81,
+   "backend_errors_p95": 4.0,
+   "completion_tokens_mean": 380.33,
+   "completion_tokens_p95": 425.0,
+   "cost_mean": 39.861,
+   "cost_p95": 45.485,
+   "duplicate_effects_mean": 0.0,
+   "duplicate_effects_p95": 0.0,
+   "exposed_tools_mean": 39.0,
+   "exposed_tools_p95": 39.0,
+   "iterations_mean": 16.81,
+   "iterations_p95": 19.0,
+   "model_calls_mean": 17.81,
+   "model_calls_p95": 20.0,
+   "n": 100,
+   "peak_context_mean": 2393.35,
+   "peak_context_p95": 2481.0,
+   "prompt_tokens_mean": 37959.32,
+   "prompt_tokens_p95": 43385.0,
+   "reasons": {
+    "ok": 100
+   },
+   "rejected_pre_execution_mean": 0.0,
+   "rejected_pre_execution_p95": 0.0,
+   "repairs_mean": 0.0,
+   "repairs_p95": 0.0,
+   "replans_mean": 0.0,
+   "replans_p95": 0.0,
+   "scenario": "loud slips 10%",
+   "sim_ms_mean": 14879.75,
+   "sim_ms_p95": 16745.0,
+   "success_ci95": [
+    0.963,
+    1.0
+   ],
+   "success_rate": 1.0,
+   "tool_calls_mean": 16.81,
+   "tool_calls_p95": 19.0,
+   "total_tokens_mean": 38339.65,
+   "total_tokens_p95": 43803.0
+  },
+  {
+   "arch": "scoped",
+   "backend_calls_mean": 15.11,
+   "backend_calls_p95": 16.0,
+   "backend_errors_mean": 0.11,
+   "backend_errors_p95": 1.0,
+   "completion_tokens_mean": 380.33,
+   "completion_tokens_p95": 425.0,
+   "cost_mean": 10.465,
+   "cost_p95": 12.614,
+   "duplicate_effects_mean": 0.0,
+   "duplicate_effects_p95": 0.0,
+   "exposed_tools_mean": 4.0,
+   "exposed_tools_p95": 4.0,
+   "iterations_mean": 16.81,
+   "iterations_p95": 19.0,
+   "model_calls_mean": 17.81,
+   "model_calls_p95": 20.0,
+   "n": 100,
+   "peak_context_mean": 744.02,
+   "peak_context_p95": 831.0,
+   "prompt_tokens_mean": 8563.83,
+   "prompt_tokens_p95": 10457.0,
+   "reasons": {
+    "ok": 100
+   },
+   "rejected_pre_execution_mean": 1.7,
+   "rejected_pre_execution_p95": 4.0,
+   "repairs_mean": 0.0,
+   "repairs_p95": 0.0,
+   "replans_mean": 0.0,
+   "replans_p95": 0.0,
+   "scenario": "loud slips 10%",
+   "sim_ms_mean": 14826.2,
+   "sim_ms_p95": 16565.0,
+   "success_ci95": [
+    0.963,
+    1.0
+   ],
+   "success_rate": 1.0,
+   "tool_calls_mean": 16.81,
+   "tool_calls_p95": 19.0,
+   "total_tokens_mean": 8944.16,
+   "total_tokens_p95": 10890.0
+  },
+  {
+   "arch": "lazy",
+   "backend_calls_mean": 16.81,
+   "backend_calls_p95": 19.0,
+   "backend_errors_mean": 1.81,
+   "backend_errors_p95": 4.0,
+   "completion_tokens_mean": 448.33,
+   "completion_tokens_p95": 493.0,
+   "cost_mean": 13.413,
+   "cost_p95": 15.724,
+   "duplicate_effects_mean": 0.0,
+   "duplicate_effects_p95": 0.0,
+   "exposed_tools_mean": 5.0,
+   "exposed_tools_p95": 5.0,
+   "iterations_mean": 19.81,
+   "iterations_p95": 22.0,
+   "model_calls_mean": 20.81,
+   "model_calls_p95": 23.0,
+   "n": 100,
+   "peak_context_mean": 877.35,
+   "peak_context_p95": 965.0,
+   "prompt_tokens_mean": 11171.78,
+   "prompt_tokens_p95": 13259.0,
+   "reasons": {
+    "ok": 100
+   },
+   "rejected_pre_execution_mean": 0.0,
+   "rejected_pre_execution_p95": 0.0,
+   "repairs_mean": 0.0,
+   "repairs_p95": 0.0,
+   "replans_mean": 0.0,
+   "replans_p95": 0.0,
+   "scenario": "loud slips 10%",
+   "sim_ms_mean": 17279.75,
+   "sim_ms_p95": 19145.0,
+   "success_ci95": [
+    0.963,
+    1.0
+   ],
+   "success_rate": 1.0,
+   "tool_calls_mean": 19.81,
+   "tool_calls_p95": 22.0,
+   "total_tokens_mean": 11620.11,
+   "total_tokens_p95": 13752.0
+  }
+ ],
+ "title": "Tool registries and capability routing"
+}

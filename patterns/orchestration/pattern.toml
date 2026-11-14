@@ -1,0 +1,148 @@
+id = "orchestration"
+order = 2
+title = "Multi-agent orchestration"
+tagline = "Whether to split work across agents, and who holds the context when you do."
+experiment = "orchestration"
+research = ["wu2023autogen", "hong2023metagpt", "li2023camel", "fourney2024magentic", "cemri2025mast", "anthropic-multiagent", "cognition-multiagents", "openai-agents-handoffs", "crewai-processes", "a2a-spec"]
+problem = """
+A task spans several skills or is too long for one context window. Splitting it across agents can isolate context, restrict each agent's tools and run parts in parallel, but every split is also a place where information is lost and where a failed agent can take work with it. The architecture decides who coordinates, what crosses agent boundaries, and what happens when an agent dies.
+"""
+applications = [
+  "Research and analysis fan-out over independent sources",
+  "Pipelines with distinct privilege levels (read data, compute, perform effects)",
+  "Customer-facing triage that routes to specialists",
+]
+decision = """
+Stay with one agent until context size, privilege separation or wall-clock time forces a split. If subtasks are independent and can be briefed in a few lines, use a supervisor with isolated workers. If the work is one continuous conversation that changes hands, use handoffs, and make the baton durable if losing a conversation is unacceptable.
+"""
+
+[[solutions]]
+id = "single"
+name = "Single agent (baseline)"
+status = "implemented"
+summary = "One loop, one context, all tools. The option every multi-agent design must beat."
+implementation = "src/agentlab/loops/react.py"
+example = "examples/01_react_loop.py"
+tests = "tests/test_orchestration.py"
+result_arch = ["single agent (react)"]
+diagram = '''
+flowchart LR
+  U([Task]) --> A[Agent with all tools]
+  A <--> T[(Tools)]
+  A --> R([Result])
+'''
+advantages = ["No coordination overhead and no information lost between agents", "Simplest to trace and debug", "Fewest model calls"]
+limitations = ["Context grows with the whole task", "One agent holds every permission", "Strictly sequential"]
+performance = "Measured at 57 steps: {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|model_calls_mean|0}} model calls, {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|total_tokens_mean|k}} tokens, peak context {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|peak_context_mean|0}}."
+complexity = "None beyond the loop."
+reliability = "One process to make durable (see durable-execution)."
+security = "No privilege separation: an injected instruction reaches every tool the task needs."
+use_when = ["The task fits comfortably in one context", "Steps are tightly coupled"]
+avoid_when = ["Context or latency limits are binding", "Parts of the task need different privileges"]
+frameworks = "Any single-agent loop."
+
+[[solutions]]
+id = "supervisor"
+name = "Supervisor with isolated specialist workers"
+status = "implemented"
+summary = "A supervisor decomposes once; code schedules subtasks onto workers as inputs become ready. Each worker gets a brief, its own tools and a fresh context, and returns condensed facts."
+implementation = "src/agentlab/orchestration/supervisor.py"
+example = "examples/04_supervisor_workers.py"
+tests = "tests/test_orchestration.py"
+result_arch = ["supervisor, 1 worker/skill", "supervisor, 3 workers/skill", "supervisor (respawn)", "supervisor (respawn) + idem"]
+diagram = '''
+flowchart TB
+  U([Task]) --> S[Supervisor: decompose]
+  S -->|brief + needed facts| D[data worker]
+  S -->|brief + needed facts| M[math worker]
+  S -->|brief + needed facts| O[ops worker]
+  D -->|facts| S
+  M -->|facts| S
+  O -->|status| S
+  S --> R([Synthesize result])
+  D -.own tools only.- TD[(lookup)]
+  M -.own tools only.- TM[(compute)]
+  O -.own tools only.- TO[(write, send)]
+'''
+advantages = [
+  "Context isolation: each worker's context holds one subtask, not the whole history",
+  "Least privilege falls out of the structure: a worker only has its domain's tools",
+  "Independent subtasks run in parallel",
+  "A crashed worker is detected and its subtask reassigned",
+]
+limitations = [
+  "Workers know only what the brief says; an under-specified brief fails silently",
+  "More model calls than a single agent",
+  "The supervisor is a single point of failure and must itself be durable",
+  "Reassigning a half-finished subtask repeats its side effects unless calls are idempotent",
+]
+performance = "Measured at 57 steps: {{orchestration|no fault, 8 stages (57 steps)|supervisor, 1 worker/skill|total_tokens_mean|k}} tokens and peak context {{orchestration|no fault, 8 stages (57 steps)|supervisor, 1 worker/skill|peak_context_mean|0}} (single agent: {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|total_tokens_mean|k}} and {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|peak_context_mean|0}}), but {{orchestration|no fault, 8 stages (57 steps)|supervisor, 1 worker/skill|model_calls_mean|0}} model calls. Makespan {{orchestration|no fault, 8 stages (57 steps)|supervisor, 3 workers/skill|makespan_ms_mean|s}}s with three workers per skill versus {{orchestration|no fault, 8 stages (57 steps)|supervisor, 1 worker/skill|makespan_ms_mean|s}}s with one. These token savings hold for cleanly decomposable tasks with compact results; open-ended research has been reported at about 15x chat usage."
+complexity = "{{complexity|*|supervisor-worker|sloc|0}} SLOC, {{complexity|*|supervisor-worker|branch_points|0}} branch points, most of it scheduling and failure handling."
+reliability = "Measured with an ops worker dying mid-subtask: {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|supervisor (respawn)|success_rate|%}} correct completion, {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|supervisor (respawn) + idem|success_rate|%}} with idempotency keys."
+security = "Workers cannot call tools outside their scope even if instructed to. The supervisor never touches tools at all."
+use_when = ["Subtasks are independent and can be specified in a short brief", "Privilege separation matters", "Wall-clock time matters and work can run in parallel"]
+avoid_when = ["Subtasks share subtle context that a brief would lose", "The task is short: at 15 steps it needed {{orchestration|no fault, 2 stages (15 steps)|supervisor, 1 worker/skill|model_calls_mean|0}} model calls and {{orchestration|no fault, 2 stages (15 steps)|supervisor, 1 worker/skill|makespan_ms_mean|s}}s against {{orchestration|no fault, 2 stages (15 steps)|single agent (react)|model_calls_mean|0}} calls and {{orchestration|no fault, 2 stages (15 steps)|single agent (react)|makespan_ms_mean|s}}s for one agent"]
+integration = """
+```python
+from agentlab.orchestration.supervisor import SupervisorWorkers
+sup = SupervisorWorkers(model, tools, clock=clock, pool={"data": 2, "math": 2, "ops": 1}, idempotent=True)
+result = sup.run(task)      # result.timeline is the per-worker schedule
+```
+The model must answer a `decompose` request with subtasks `{id, domain, steps, needs}`.
+"""
+frameworks = "CrewAI hierarchical process; LangGraph supervisor graphs; Magentic-One orchestrator; Anthropic orchestrator-workers; A2A task delegation."
+
+[[solutions]]
+id = "handoff"
+name = "Peer-to-peer handoff"
+status = "implemented"
+summary = "No coordinator. The active specialist works until the next step is outside its tools, then transfers the conversation, whole, to a peer."
+implementation = "src/agentlab/orchestration/handoff.py"
+example = "examples/05_peer_handoff.py"
+tests = "tests/test_orchestration.py"
+result_arch = ["peer handoff", "peer handoff, durable baton + replica", "peer handoff, durable baton + replica + idem"]
+diagram = '''
+flowchart LR
+  U([Task]) --> D[data agent]
+  D -->|transfer_to_math + full transcript| M[math agent]
+  M -->|transfer_to_ops + full transcript| O[ops agent]
+  O -->|transfer_to_data + full transcript| D
+  O --> R([Result])
+'''
+advantages = [
+  "Nothing is lost at a boundary: the receiver sees everything",
+  "No coordinator to build, pay for or keep alive",
+  "Tool scoping per agent, like the supervisor",
+]
+limitations = [
+  "The transcript travels and grows: the most expensive option on long tasks",
+  "Each handoff is an extra model turn",
+  "Strictly sequential",
+  "The active agent is the only holder of the conversation; if it dies the task is gone unless the handoff envelope was persisted and a replica exists",
+]
+performance = "Measured at 57 steps: {{orchestration|no fault, 8 stages (57 steps)|peer handoff|total_tokens_mean|k}} tokens over {{orchestration|no fault, 8 stages (57 steps)|peer handoff|messages_mean|0}} handoffs; peak context {{orchestration|no fault, 8 stages (57 steps)|peer handoff|peak_context_mean|0}}."
+complexity = "{{complexity|*|peer handoff|sloc|0}} SLOC, {{complexity|*|peer handoff|branch_points|0}} branch points."
+reliability = "Measured with the ops agent dying mid-turn: {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|peer handoff|success_rate|%}} completion as-is; {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|peer handoff, durable baton + replica|success_rate|%}} with a durable baton and a replica; {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|peer handoff, durable baton + replica + idem|success_rate|%}} when calls also carry idempotency keys."
+security = "Per-agent tool scopes hold, but every agent reads the full transcript, so untrusted text reaches all of them."
+use_when = ["One conversation that changes hands (triage to specialist)", "Boundaries are few", "Losing context at a boundary is worse than paying for it"]
+avoid_when = ["Many alternations between skills", "Long tasks", "You need parallelism"]
+integration = """
+```python
+from agentlab.orchestration.handoff import HandoffSwarm
+swarm = HandoffSwarm(model, tools, clock=clock, replicas={"ops": 2}, redeliver=True, idempotent=True)
+result = swarm.run(task)
+```
+Handoffs are ordinary tools named `transfer_to_<skill>`; a real model needs no special support.
+"""
+frameworks = "OpenAI Agents SDK handoffs; Swarm; LangGraph swarm; AutoGen Swarm."
+
+[[solutions]]
+id = "blackboard"
+name = "Shared blackboard / group chat with a speaker selector"
+status = "documented"
+summary = "All agents read and write one shared record; a selector (model or rule) picks who acts next."
+advantages = ["Opportunistic collaboration without a fixed plan", "Shared state is the single source of truth"]
+limitations = ["Selector calls on every turn", "Shared context grows like a single agent's", "Hard to bound and to test"]
+use_when = ["Loosely structured problem solving where the order of contributions is not known in advance"]
+avoid_when = ["Tasks with a known dependency structure"]
+frameworks = "AutoGen group chat with selector; Magentic-One ledger. Not implemented here; see the roadmap."

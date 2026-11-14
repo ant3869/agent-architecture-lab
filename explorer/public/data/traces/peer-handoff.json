@@ -1,0 +1,1133 @@
+{
+ "description": "Three specialists pass one conversation between them. Watch the size of each handoff message grow.",
+ "events": [
+  {
+   "agent": "data-1",
+   "data": {
+    "name": "handoff.run",
+    "parent": ""
+   },
+   "kind": "span_start",
+   "seq": 0,
+   "span": "sp1",
+   "t_ms": 0
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "d4c7b1be5f70d1fb",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t5-2x2:st1:item1"
+      },
+      "idem_key": "",
+      "step_id": "s1",
+      "tool": "lookup"
+     },
+     "completion_tokens": 23,
+     "cost": 0.274,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 159,
+     "replayed": false,
+     "text": "Thought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 1,
+   "span": "sp1",
+   "t_ms": 800
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t5-2x2:st1:item1"
+     },
+     "idem_key": "",
+     "step_id": "s1",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 4,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 2,
+   "span": "sp1",
+   "t_ms": 840
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "a189e6932078b5bf",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t5-2x2:st1:item2"
+      },
+      "idem_key": "",
+      "step_id": "s2",
+      "tool": "lookup"
+     },
+     "completion_tokens": 23,
+     "cost": 0.304,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 189,
+     "replayed": false,
+     "text": "Thought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 3,
+   "span": "sp1",
+   "t_ms": 1640
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t5-2x2:st1:item2"
+     },
+     "idem_key": "",
+     "step_id": "s2",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 3,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 4,
+   "span": "sp1",
+   "t_ms": 1680
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "02c34e11322e2d64",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "add s1 and s2"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s3",
+      "tool": "transfer_to_math"
+     },
+     "completion_tokens": 23,
+     "cost": 0.334,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 219,
+     "replayed": false,
+     "text": "Thought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 5,
+   "span": "sp1",
+   "t_ms": 2480
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}",
+    "to": "math-1",
+    "tokens": 187
+   },
+   "kind": "message",
+   "seq": 6,
+   "span": "sp1",
+   "t_ms": 2480
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "691c093902fd303e",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "a": 4,
+       "b": 3,
+       "op": "add"
+      },
+      "idem_key": "",
+      "step_id": "s3",
+      "tool": "compute"
+     },
+     "completion_tokens": 19,
+     "cost": 0.356,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 261,
+     "replayed": false,
+     "text": "Thought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 7,
+   "span": "sp1",
+   "t_ms": 3280
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "a": 4,
+      "b": 3,
+      "op": "add"
+     },
+     "idem_key": "",
+     "step_id": "s3",
+     "tool": "compute"
+    },
+    "duration_ms": 5,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 7,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 8,
+   "span": "sp1",
+   "t_ms": 3285
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "6f989164f2e3a5b7",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "write s3 to report:t5-2x2:st1"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s4",
+      "tool": "transfer_to_ops"
+     },
+     "completion_tokens": 31,
+     "cost": 0.442,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 287,
+     "replayed": false,
+     "text": "Thought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 9,
+   "span": "sp1",
+   "t_ms": 4085
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})\nObservation[s3] compute -> 7\nThought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})\nObservation[_handoff:s4] transfer_to_ops -> {\"now_active\": \"ops-1\"}",
+    "to": "ops-1",
+    "tokens": 261
+   },
+   "kind": "message",
+   "seq": 10,
+   "span": "sp1",
+   "t_ms": 4085
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "c2f5530113632709",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "report:t5-2x2:st1",
+       "value": 7
+      },
+      "idem_key": "",
+      "step_id": "s4",
+      "tool": "write"
+     },
+     "completion_tokens": 25,
+     "cost": 0.482,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 357,
+     "replayed": false,
+     "text": "Thought: write s3 to report:t5-2x2:st1 [s4]\nAction: write({\"key\": \"report:t5-2x2:st1\", \"value\": 7})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 11,
+   "span": "sp1",
+   "t_ms": 4885
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "report:t5-2x2:st1",
+      "value": 7
+     },
+     "idem_key": "",
+     "step_id": "s4",
+     "tool": "write"
+    },
+    "duration_ms": 60,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": "written",
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 12,
+   "span": "sp1",
+   "t_ms": 4945
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "2356b6f88ae969e8",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "look up inv:t5-2x2:st2:item1"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s5",
+      "tool": "transfer_to_data"
+     },
+     "completion_tokens": 30,
+     "cost": 0.541,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 391,
+     "replayed": false,
+     "text": "Thought: look up inv:t5-2x2:st2:item1 [_handoff:s5]\nAction: transfer_to_data({\"reason\": \"look up inv:t5-2x2:st2:item1\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 13,
+   "span": "sp1",
+   "t_ms": 5745
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})\nObservation[s3] compute -> 7\nThought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})\nObservation[_handoff:s4] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s3 to report:t5-2x2:st1 [s4]\nAction: write({\"key\": \"report:t5-2x2:st1\", \"value\": 7})\nObservation[s4] write -> \"written\"\nThought: look up inv:t5-2x2:st2:item1 [_handoff:s5]\nAction: transfer_to_data({\"reason\": \"look up inv:t5-2x2:st2:item1\"})\nObservation[_handoff:s5] transfer_to_data -> {\"now_active\": \"data-1\"}",
+    "to": "data-1",
+    "tokens": 342
+   },
+   "kind": "message",
+   "seq": 14,
+   "span": "sp1",
+   "t_ms": 5745
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "8da5cca6768d91e2",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t5-2x2:st2:item1"
+      },
+      "idem_key": "",
+      "step_id": "s5",
+      "tool": "lookup"
+     },
+     "completion_tokens": 23,
+     "cost": 0.531,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 416,
+     "replayed": false,
+     "text": "Thought: look up inv:t5-2x2:st2:item1 [s5]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item1\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 15,
+   "span": "sp1",
+   "t_ms": 6545
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t5-2x2:st2:item1"
+     },
+     "idem_key": "",
+     "step_id": "s5",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 8,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 16,
+   "span": "sp1",
+   "t_ms": 6585
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "38f971873963183d",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "inv:t5-2x2:st2:item2"
+      },
+      "idem_key": "",
+      "step_id": "s6",
+      "tool": "lookup"
+     },
+     "completion_tokens": 23,
+     "cost": 0.561,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 446,
+     "replayed": false,
+     "text": "Thought: look up inv:t5-2x2:st2:item2 [s6]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item2\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 17,
+   "span": "sp1",
+   "t_ms": 7385
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "inv:t5-2x2:st2:item2"
+     },
+     "idem_key": "",
+     "step_id": "s6",
+     "tool": "lookup"
+    },
+    "duration_ms": 40,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 4,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 18,
+   "span": "sp1",
+   "t_ms": 7425
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "467504dc2fd30c1c",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "add s5 and s6"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s7",
+      "tool": "transfer_to_math"
+     },
+     "completion_tokens": 23,
+     "cost": 0.591,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 476,
+     "replayed": false,
+     "text": "Thought: add s5 and s6 [_handoff:s7]\nAction: transfer_to_math({\"reason\": \"add s5 and s6\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 19,
+   "span": "sp1",
+   "t_ms": 8225
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})\nObservation[s3] compute -> 7\nThought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})\nObservation[_handoff:s4] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s3 to report:t5-2x2:st1 [s4]\nAction: write({\"key\": \"report:t5-2x2:st1\", \"value\": 7})\nObservation[s4] write -> \"written\"\nThought: look up inv:t5-2x2:st2:item1 [_handoff:s5]\nAction: transfer_to_data({\"reason\": \"look up inv:t5-2x2:st2:item1\"})\nObservation[_handoff:s5] transfer_to_data -> {\"now_active\": \"data-1\"}\nThought: look up inv:t5-2x2:st2:item1 [s5]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item1\"})\nObservation[s5] lookup -> 8\nThought: look up inv:t5-2x2:st2:item2 [s6]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item2\"})\nObservation[s6] lookup -> 4\nThought: add s5 and s6 [_handoff:s7]\nAction: transfer_to_math({\"reason\": \"add s5 and s6\"})\nObservation[_handoff:s7] transfer_to_math -> {\"now_active\": \"math-1\"}",
+    "to": "math-1",
+    "tokens": 442
+   },
+   "kind": "message",
+   "seq": 20,
+   "span": "sp1",
+   "t_ms": 8225
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "ac17e79d0cf1507e",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "a": 8,
+       "b": 4,
+       "op": "add"
+      },
+      "idem_key": "",
+      "step_id": "s7",
+      "tool": "compute"
+     },
+     "completion_tokens": 19,
+     "cost": 0.613,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 518,
+     "replayed": false,
+     "text": "Thought: add s5 and s6 [s7]\nAction: compute({\"a\": 8, \"b\": 4, \"op\": \"add\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 21,
+   "span": "sp1",
+   "t_ms": 9025
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "a": 8,
+      "b": 4,
+      "op": "add"
+     },
+     "idem_key": "",
+     "step_id": "s7",
+     "tool": "compute"
+    },
+    "duration_ms": 5,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 12,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 22,
+   "span": "sp1",
+   "t_ms": 9030
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "b2e02b0e044a17ff",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "write s7 to report:t5-2x2:st2"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s8",
+      "tool": "transfer_to_ops"
+     },
+     "completion_tokens": 31,
+     "cost": 0.7,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 545,
+     "replayed": false,
+     "text": "Thought: write s7 to report:t5-2x2:st2 [_handoff:s8]\nAction: transfer_to_ops({\"reason\": \"write s7 to report:t5-2x2:st2\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 23,
+   "span": "sp1",
+   "t_ms": 9830
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})\nObservation[s3] compute -> 7\nThought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})\nObservation[_handoff:s4] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s3 to report:t5-2x2:st1 [s4]\nAction: write({\"key\": \"report:t5-2x2:st1\", \"value\": 7})\nObservation[s4] write -> \"written\"\nThought: look up inv:t5-2x2:st2:item1 [_handoff:s5]\nAction: transfer_to_data({\"reason\": \"look up inv:t5-2x2:st2:item1\"})\nObservation[_handoff:s5] transfer_to_data -> {\"now_active\": \"data-1\"}\nThought: look up inv:t5-2x2:st2:item1 [s5]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item1\"})\nObservation[s5] lookup -> 8\nThought: look up inv:t5-2x2:st2:item2 [s6]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item2\"})\nObservation[s6] lookup -> 4\nThought: add s5 and s6 [_handoff:s7]\nAction: transfer_to_math({\"reason\": \"add s5 and s6\"})\nObservation[_handoff:s7] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s5 and s6 [s7]\nAction: compute({\"a\": 8, \"b\": 4, \"op\": \"add\"})\nObservation[s7] compute -> 12\nThought: write s7 to report:t5-2x2:st2 [_handoff:s8]\nAction: transfer_to_ops({\"reason\": \"write s7 to report:t5-2x2:st2\"})\nObservation[_handoff:s8] transfer_to_ops -> {\"now_active\": \"ops-1\"}",
+    "to": "ops-1",
+    "tokens": 516
+   },
+   "kind": "message",
+   "seq": 24,
+   "span": "sp1",
+   "t_ms": 9830
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "69def4701cc3bc1c",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "report:t5-2x2:st2",
+       "value": 12
+      },
+      "idem_key": "",
+      "step_id": "s8",
+      "tool": "write"
+     },
+     "completion_tokens": 25,
+     "cost": 0.74,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 615,
+     "replayed": false,
+     "text": "Thought: write s7 to report:t5-2x2:st2 [s8]\nAction: write({\"key\": \"report:t5-2x2:st2\", \"value\": 12})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 25,
+   "span": "sp1",
+   "t_ms": 10630
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "report:t5-2x2:st2",
+      "value": 12
+     },
+     "idem_key": "",
+     "step_id": "s8",
+     "tool": "write"
+    },
+    "duration_ms": 60,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": "written",
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 26,
+   "span": "sp1",
+   "t_ms": 10690
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "0f97da81e6f310a4",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "add s3 and s7"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s9",
+      "tool": "transfer_to_math"
+     },
+     "completion_tokens": 23,
+     "cost": 0.764,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 649,
+     "replayed": false,
+     "text": "Thought: add s3 and s7 [_handoff:s9]\nAction: transfer_to_math({\"reason\": \"add s3 and s7\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 27,
+   "span": "sp1",
+   "t_ms": 11490
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})\nObservation[s3] compute -> 7\nThought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})\nObservation[_handoff:s4] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s3 to report:t5-2x2:st1 [s4]\nAction: write({\"key\": \"report:t5-2x2:st1\", \"value\": 7})\nObservation[s4] write -> \"written\"\nThought: look up inv:t5-2x2:st2:item1 [_handoff:s5]\nAction: transfer_to_data({\"reason\": \"look up inv:t5-2x2:st2:item1\"})\nObservation[_handoff:s5] transfer_to_data -> {\"now_active\": \"data-1\"}\nThought: look up inv:t5-2x2:st2:item1 [s5]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item1\"})\nObservation[s5] lookup -> 8\nThought: look up inv:t5-2x2:st2:item2 [s6]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item2\"})\nObservation[s6] lookup -> 4\nThought: add s5 and s6 [_handoff:s7]\nAction: transfer_to_math({\"reason\": \"add s5 and s6\"})\nObservation[_handoff:s7] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s5 and s6 [s7]\nAction: compute({\"a\": 8, \"b\": 4, \"op\": \"add\"})\nObservation[s7] compute -> 12\nThought: write s7 to report:t5-2x2:st2 [_handoff:s8]\nAction: transfer_to_ops({\"reason\": \"write s7 to report:t5-2x2:st2\"})\nObservation[_handoff:s8] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s7 to report:t5-2x2:st2 [s8]\nAction: write({\"key\": \"report:t5-2x2:st2\", \"value\": 12})\nObservation[s8] write -> \"written\"\nThought: add s3 and s7 [_handoff:s9]\nAction: transfer_to_math({\"reason\": \"add s3 and s7\"})\nObservation[_handoff:s9] transfer_to_math -> {\"now_active\": \"math-1\"}",
+    "to": "math-1",
+    "tokens": 590
+   },
+   "kind": "message",
+   "seq": 28,
+   "span": "sp1",
+   "t_ms": 11490
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "edeb374f866e2949",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "a": 7,
+       "b": 12,
+       "op": "add"
+      },
+      "idem_key": "",
+      "step_id": "s9",
+      "tool": "compute"
+     },
+     "completion_tokens": 19,
+     "cost": 0.763,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 668,
+     "replayed": false,
+     "text": "Thought: add s3 and s7 [s9]\nAction: compute({\"a\": 7, \"b\": 12, \"op\": \"add\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 29,
+   "span": "sp1",
+   "t_ms": 12290
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "a": 7,
+      "b": 12,
+      "op": "add"
+     },
+     "idem_key": "",
+     "step_id": "s9",
+     "tool": "compute"
+    },
+    "duration_ms": 5,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": 19,
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 30,
+   "span": "sp1",
+   "t_ms": 12295
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "4978eef3dd586cfc",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "reason": "write s9 to report:t5-2x2:total"
+      },
+      "idem_key": "",
+      "step_id": "_handoff:s10",
+      "tool": "transfer_to_ops"
+     },
+     "completion_tokens": 32,
+     "cost": 0.855,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 695,
+     "replayed": false,
+     "text": "Thought: write s9 to report:t5-2x2:total [_handoff:s10]\nAction: transfer_to_ops({\"reason\": \"write s9 to report:t5-2x2:total\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 31,
+   "span": "sp1",
+   "t_ms": 13095
+  },
+  {
+   "agent": "math-1",
+   "data": {
+    "msg_kind": "handoff",
+    "task_id": "t5-2x2",
+    "text": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.\nThought: look up inv:t5-2x2:st1:item1 [s1]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item1\"})\nObservation[s1] lookup -> 4\nThought: look up inv:t5-2x2:st1:item2 [s2]\nAction: lookup({\"key\": \"inv:t5-2x2:st1:item2\"})\nObservation[s2] lookup -> 3\nThought: add s1 and s2 [_handoff:s3]\nAction: transfer_to_math({\"reason\": \"add s1 and s2\"})\nObservation[_handoff:s3] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s1 and s2 [s3]\nAction: compute({\"a\": 4, \"b\": 3, \"op\": \"add\"})\nObservation[s3] compute -> 7\nThought: write s3 to report:t5-2x2:st1 [_handoff:s4]\nAction: transfer_to_ops({\"reason\": \"write s3 to report:t5-2x2:st1\"})\nObservation[_handoff:s4] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s3 to report:t5-2x2:st1 [s4]\nAction: write({\"key\": \"report:t5-2x2:st1\", \"value\": 7})\nObservation[s4] write -> \"written\"\nThought: look up inv:t5-2x2:st2:item1 [_handoff:s5]\nAction: transfer_to_data({\"reason\": \"look up inv:t5-2x2:st2:item1\"})\nObservation[_handoff:s5] transfer_to_data -> {\"now_active\": \"data-1\"}\nThought: look up inv:t5-2x2:st2:item1 [s5]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item1\"})\nObservation[s5] lookup -> 8\nThought: look up inv:t5-2x2:st2:item2 [s6]\nAction: lookup({\"key\": \"inv:t5-2x2:st2:item2\"})\nObservation[s6] lookup -> 4\nThought: add s5 and s6 [_handoff:s7]\nAction: transfer_to_math({\"reason\": \"add s5 and s6\"})\nObservation[_handoff:s7] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s5 and s6 [s7]\nAction: compute({\"a\": 8, \"b\": 4, \"op\": \"add\"})\nObservation[s7] compute -> 12\nThought: write s7 to report:t5-2x2:st2 [_handoff:s8]\nAction: transfer_to_ops({\"reason\": \"write s7 to report:t5-2x2:st2\"})\nObservation[_handoff:s8] transfer_to_ops -> {\"now_active\": \"ops-1\"}\nThought: write s7 to report:t5-2x2:st2 [s8]\nAction: write({\"key\": \"report:t5-2x2:st2\", \"value\": 12})\nObservation[s8] write -> \"written\"\nThought: add s3 and s7 [_handoff:s9]\nAction: transfer_to_math({\"reason\": \"add s3 and s7\"})\nObservation[_handoff:s9] transfer_to_math -> {\"now_active\": \"math-1\"}\nThought: add s3 and s7 [s9]\nAction: compute({\"a\": 7, \"b\": 12, \"op\": \"add\"})\nObservation[s9] compute -> 19\nThought: write s9 to report:t5-2x2:total [_handoff:s10]\nAction: transfer_to_ops({\"reason\": \"write s9 to report:t5-2x2:total\"})\nObservation[_handoff:s10] transfer_to_ops -> {\"now_active\": \"ops-1\"}",
+    "to": "ops-1",
+    "tokens": 666
+   },
+   "kind": "message",
+   "seq": 32,
+   "span": "sp1",
+   "t_ms": 13095
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "35a6e181719aab1e",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "key": "report:t5-2x2:total",
+       "value": 19
+      },
+      "idem_key": "",
+      "step_id": "s10",
+      "tool": "write"
+     },
+     "completion_tokens": 27,
+     "cost": 0.901,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 766,
+     "replayed": false,
+     "text": "Thought: write s9 to report:t5-2x2:total [s10]\nAction: write({\"key\": \"report:t5-2x2:total\", \"value\": 19})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 33,
+   "span": "sp1",
+   "t_ms": 13895
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "key": "report:t5-2x2:total",
+      "value": 19
+     },
+     "idem_key": "",
+     "step_id": "s10",
+     "tool": "write"
+    },
+    "duration_ms": 60,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": "written",
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 34,
+   "span": "sp1",
+   "t_ms": 13955
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "9023e6f8ef48a19b",
+    "response": {
+     "__t": "ModelResponse",
+     "call": {
+      "__t": "ToolCall",
+      "args": {
+       "body": 19,
+       "to": "ops"
+      },
+      "idem_key": "",
+      "step_id": "s11",
+      "tool": "send"
+     },
+     "completion_tokens": 19,
+     "cost": 0.897,
+     "data": {},
+     "final": false,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 802,
+     "replayed": false,
+     "text": "Thought: notify ops with s9 [s11]\nAction: send({\"body\": 19, \"to\": \"ops\"})"
+    }
+   },
+   "kind": "model_call",
+   "seq": 35,
+   "span": "sp1",
+   "t_ms": 14755
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "call": {
+     "__t": "ToolCall",
+     "args": {
+      "body": 19,
+      "to": "ops"
+     },
+     "idem_key": "",
+     "step_id": "s11",
+     "tool": "send"
+    },
+    "duration_ms": 120,
+    "result": {
+     "__t": "ToolResult",
+     "attempts": 1,
+     "deduped": false,
+     "error": "",
+     "error_code": "",
+     "info": {},
+     "note": "",
+     "ok": true,
+     "output": "sent",
+     "replayed": false,
+     "retryable": false
+    }
+   },
+   "kind": "tool_result",
+   "seq": 36,
+   "span": "sp1",
+   "t_ms": 14875
+  },
+  {
+   "agent": "ops-1",
+   "data": {
+    "mode": "act",
+    "request_fp": "7f38398390e26c2e",
+    "response": {
+     "__t": "ModelResponse",
+     "call": null,
+     "completion_tokens": 5,
+     "cost": 0.854,
+     "data": {
+      "blocked": false
+     },
+     "final": true,
+     "latency_ms": 800,
+     "model": "sim-base",
+     "plan": null,
+     "prompt_tokens": 829,
+     "replayed": false,
+     "text": "FINAL: task complete"
+    }
+   },
+   "kind": "model_call",
+   "seq": 37,
+   "span": "sp1",
+   "t_ms": 15675
+  },
+  {
+   "agent": "data-1",
+   "data": {
+    "status": "ok"
+   },
+   "kind": "span_end",
+   "seq": 38,
+   "span": "sp1",
+   "t_ms": 15675
+  }
+ ],
+ "goal": "Task t5-2x2: (s1) look up inv:t5-2x2:st1:item1. (s2) look up inv:t5-2x2:st1:item2. (s3) add s1 and s2. (s4) write s3 to report:t5-2x2:st1. (s5) look up inv:t5-2x2:st2:item1. (s6) look up inv:t5-2x2:st2:item2. (s7) add s5 and s6. (s8) write s7 to report:t5-2x2:st2. (s9) add s3 and s7. (s10) write s9 to report:t5-2x2:total. (s11) notify ops with s9.",
+ "id": "peer-handoff",
+ "pattern": "orchestration",
+ "solution": "handoff",
+ "summary": {
+  "backend_calls": 11,
+  "model_calls": 19,
+  "outcome": "ok",
+  "peak_context": 829,
+  "sim_ms": 15675,
+  "status": "final",
+  "steps": 11,
+  "tokens": 9731,
+  "tool_calls": 11
+ },
+ "title": "Peer handoff: the transcript travels"
+}

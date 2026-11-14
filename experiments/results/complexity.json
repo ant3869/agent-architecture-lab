@@ -1,0 +1,192 @@
+{
+ "columns": [
+  {
+   "key": "arch",
+   "label": "Implementation"
+  },
+  {
+   "key": "file",
+   "label": "File"
+  },
+  {
+   "key": "sloc",
+   "label": "SLOC"
+  },
+  {
+   "key": "branch_points",
+   "label": "Branch points"
+  },
+  {
+   "key": "functions",
+   "label": "Functions"
+  },
+  {
+   "key": "classes",
+   "label": "Classes"
+  },
+  {
+   "key": "longest_function",
+   "label": "Longest function (lines)"
+  }
+ ],
+ "conditions": {
+  "method": "Python ast; SLOC excludes blank lines, comments and docstrings; branch points = if/for/while/try/except/with/match/boolean-op/conditional-expression/comprehension nodes"
+ },
+ "findings": [
+  "ReAct is the smallest loop (57 SLOC, 12 branch points); plan-and-execute is 47 SLOC; the verified graph is 139 SLOC plus a 86-SLOC graph engine it depends on.",
+  "Supervisor-worker is 136 SLOC with 36 branch points; peer handoff is 107 SLOC with 22.",
+  "Journal replay adds 60 SLOC and wraps any loop unchanged; snapshot checkpointing needs a hook inside each loop instead."
+ ],
+ "group_by": [
+  "scenario"
+ ],
+ "id": "complexity",
+ "limitations": [
+  "Size of a reference implementation, not of a production system: no async I/O, streaming, auth or schema migration.",
+  "Shared infrastructure (runtime, tracer, simulator) is excluded from every row."
+ ],
+ "question": "How much code and branching does each pattern cost to own?",
+ "rows": [
+  {
+   "arch": "react",
+   "branch_points": 12,
+   "classes": 1,
+   "file": "src/agentlab/loops/react.py",
+   "functions": 3,
+   "longest_function": 34,
+   "scenario": "execution loops",
+   "sloc": 57
+  },
+  {
+   "arch": "plan_execute",
+   "branch_points": 8,
+   "classes": 1,
+   "file": "src/agentlab/loops/plan_execute.py",
+   "functions": 3,
+   "longest_function": 29,
+   "scenario": "execution loops",
+   "sloc": 47
+  },
+  {
+   "arch": "verified_graph",
+   "branch_points": 38,
+   "classes": 1,
+   "file": "src/agentlab/loops/verified_graph.py",
+   "functions": 15,
+   "longest_function": 29,
+   "scenario": "execution loops",
+   "sloc": 139
+  },
+  {
+   "arch": "(graph engine)",
+   "branch_points": 23,
+   "classes": 4,
+   "file": "src/agentlab/statemachine/graph.py",
+   "functions": 13,
+   "longest_function": 21,
+   "scenario": "execution loops",
+   "sloc": 86
+  },
+  {
+   "arch": "supervisor-worker",
+   "branch_points": 36,
+   "classes": 2,
+   "file": "src/agentlab/orchestration/supervisor.py",
+   "functions": 5,
+   "longest_function": 58,
+   "scenario": "orchestration",
+   "sloc": 136
+  },
+  {
+   "arch": "peer handoff",
+   "branch_points": 22,
+   "classes": 2,
+   "file": "src/agentlab/orchestration/handoff.py",
+   "functions": 6,
+   "longest_function": 49,
+   "scenario": "orchestration",
+   "sloc": 107
+  },
+  {
+   "arch": "(message bus)",
+   "branch_points": 8,
+   "classes": 4,
+   "file": "src/agentlab/orchestration/bus.py",
+   "functions": 7,
+   "longest_function": 9,
+   "scenario": "orchestration",
+   "sloc": 53
+  },
+  {
+   "arch": "snapshot store + journal store",
+   "branch_points": 3,
+   "classes": 2,
+   "file": "src/agentlab/durability/stores.py",
+   "functions": 9,
+   "longest_function": 8,
+   "scenario": "durability",
+   "sloc": 47
+  },
+  {
+   "arch": "journal replay",
+   "branch_points": 7,
+   "classes": 4,
+   "file": "src/agentlab/durability/journal.py",
+   "functions": 10,
+   "longest_function": 13,
+   "scenario": "durability",
+   "sloc": 60
+  },
+  {
+   "arch": "retry / breaker / idempotency",
+   "branch_points": 25,
+   "classes": 4,
+   "file": "src/agentlab/recovery/policies.py",
+   "functions": 11,
+   "longest_function": 16,
+   "scenario": "middleware",
+   "sloc": 83
+  },
+  {
+   "arch": "permissions",
+   "branch_points": 27,
+   "classes": 4,
+   "file": "src/agentlab/permissions/policy.py",
+   "functions": 16,
+   "longest_function": 18,
+   "scenario": "middleware",
+   "sloc": 106
+  },
+  {
+   "arch": "routers",
+   "branch_points": 7,
+   "classes": 5,
+   "file": "src/agentlab/routing/router.py",
+   "functions": 9,
+   "longest_function": 9,
+   "scenario": "middleware",
+   "sloc": 37
+  },
+  {
+   "arch": "context policies",
+   "branch_points": 17,
+   "classes": 5,
+   "file": "src/agentlab/memory/context.py",
+   "functions": 11,
+   "longest_function": 16,
+   "scenario": "middleware",
+   "sloc": 76
+  },
+  {
+   "arch": "tool registries",
+   "branch_points": 41,
+   "classes": 4,
+   "file": "src/agentlab/tools/registry.py",
+   "functions": 15,
+   "longest_function": 18,
+   "scenario": "middleware",
+   "sloc": 122
+  }
+ ],
+ "title": "Implementation complexity"
+}

@@ -1,0 +1,121 @@
+id = "permissions"
+order = 8
+title = "Permissions, approval and authorization"
+tagline = "Enforcing what an agent may do, outside the model."
+experiment = "permissions"
+research = ["greshake2023injection", "willison-trifecta", "owasp-llm-top10", "debenedetti2025camel", "macaroons", "mcp-tools", "mcp-security", "anthropic-sandboxing"]
+problem = """
+An agent that reads untrusted content and can act on the world can be instructed by that content. The model cannot be relied on to refuse. Authorization therefore has to be enforced at the tool boundary by code the model cannot influence, at a granularity fine enough to tell a legitimate call from a malicious one that uses the same tool.
+"""
+applications = ["Agents that read email, tickets, web pages or documents and can also send or write", "Delegating a subset of authority to sub-agents", "Regulated actions that need a human decision and an audit trail"]
+decision = """
+Use an allowlist to remove tools an agent never needs. For tools it does need, constrain arguments with capability tokens wherever the legitimate values can be enumerated or patterned. Reserve human approval for the residue that cannot be expressed as policy, and keep that volume low enough that the reviewer still reads.
+"""
+
+[[solutions]]
+id = "allowlist"
+name = "Tool allowlist"
+status = "implemented"
+summary = "Only named tools exist for this agent."
+implementation = "src/agentlab/permissions/policy.py"
+example = "examples/13_permissions_and_approval.py"
+tests = "tests/test_permissions.py"
+result_arch = ["none", "allowlist (tool names)"]
+advantages = ["Trivial to reason about", "Removes whole classes of action"]
+limitations = ["Cannot distinguish a good call from a bad call to an allowed tool"]
+reliability = "Measured: with `send` allowed, the injected send executed in {{permissions|model always obeys injected text|allowlist (tool names)|exfil_mean|%}} of runs, the same as no policy."
+security = "Necessary, not sufficient."
+use_when = ["Always, as the outer layer"]
+avoid_when = ["As the only control on tools that take a destination"]
+frameworks = "Per-agent tool lists in every SDK; MCP server allowlists."
+
+[[solutions]]
+id = "approval"
+name = "Risk-tiered human approval with interrupt and resume"
+status = "implemented"
+summary = "Classify tools by effect. Reads run; risky tiers pause the run until a person approves or denies that exact call."
+implementation = "src/agentlab/permissions/policy.py"
+example = "examples/13_permissions_and_approval.py"
+tests = "tests/test_permissions.py"
+result_arch = ["approval, attentive reviewer", "approval, rubber-stamp reviewer"]
+diagram = '''
+sequenceDiagram
+  participant M as Model
+  participant G as Approval gate
+  participant H as Human
+  participant T as Tool
+  M->>G: send(to, body)
+  G-->>M: Interrupt (run pauses, state saved)
+  H->>G: approve or deny this call
+  alt approved
+    G->>T: execute once
+    T-->>M: result
+  else denied
+    G-->>M: APPROVAL_DENIED
+  end
+'''
+advantages = ["Handles actions no static policy can pre-approve", "Produces an audit record", "The pause is a checkpoint, so approval can take hours"]
+limitations = ["Human attention is the scarce resource; volume causes rubber-stamping", "Adds latency", "The run must be resumable"]
+performance = "Measured: {{permissions|model always obeys injected text|approval, attentive reviewer|approvals_mean|1}} approval requests per task."
+reliability = "Depends entirely on the reviewer: {{permissions|model always obeys injected text|approval, attentive reviewer|exfil_mean|%}} exfiltration with an attentive one, {{permissions|model always obeys injected text|approval, rubber-stamp reviewer|exfil_mean|%}} with one who approves everything."
+security = "A grant is for one exact call and is consumed on use."
+use_when = ["Irreversible, high-value or novel actions", "Regulatory need for a human decision"]
+avoid_when = ["High-frequency actions", "Actions a policy can decide"]
+integration = """
+```python
+from agentlab.permissions.policy import ApprovalTools
+gate = ApprovalTools(tools, ask=("external",))            # raises Interrupt for that tier
+result = loop.run(goal)
+while result.status == "interrupted":
+    ok = ask_human(result.pending)
+    if ok: gate.grant(result.pending)
+    result = loop.run(goal, resume=result.history, pending=(result.pending, ok))
+```
+"""
+frameworks = "LangGraph interrupt/Command(resume); OpenAI Agents SDK tool approval; MCP human-in-the-loop guidance; Claude Code permission modes."
+
+[[solutions]]
+id = "capability"
+name = "Attenuable capability tokens"
+status = "implemented"
+summary = "The agent holds a signed token listing tools, argument patterns, a call budget and an expiry. Any holder can narrow it; nobody can widen it."
+implementation = "src/agentlab/permissions/policy.py"
+example = "examples/13_permissions_and_approval.py"
+tests = "tests/test_permissions.py"
+result_arch = ["capability token (argument-scoped)"]
+diagram = '''
+flowchart LR
+  R[Root: mint token] -->|attenuate: send.to = ops| A[Agent token]
+  A -->|attenuate: tools = lookup| W[Sub-agent token]
+  A --> C{Check signature + every caveat}
+  C -->|all hold| T[(Tool)]
+  C -->|any fails| D[CAPABILITY_DENIED]
+'''
+advantages = ["Argument-level control with no human in the loop", "Safe delegation: a sub-agent's token is provably a subset", "Budget and expiry bound a runaway or hijacked agent"]
+limitations = ["Legitimate values must be expressible as patterns", "A bearer token must be kept secret", "Does not track where data came from"]
+performance = "No human requests; one HMAC chain per call."
+complexity = "Part of a {{complexity|*|permissions|sloc|0}}-SLOC module."
+reliability = "Measured: {{permissions|model always obeys injected text|capability token (argument-scoped)|exfil_mean|%}} exfiltration and {{permissions|model always obeys injected text|capability token (argument-scoped)|success_rate|%}} task success with a model that always obeys the injection."
+security = "Tampering (removing or editing a caveat) invalidates the signature; tested."
+use_when = ["Destinations and resources are known per task", "Delegating to sub-agents or third-party agents"]
+avoid_when = ["Destinations are open-ended; use data-flow tracking instead"]
+integration = """
+```python
+from agentlab.permissions.policy import mint, attenuate, CapabilityTools
+root = mint(secret, "session-42", {"tools": ["lookup", "compute", "write", "send"]})
+cap = attenuate(root, {"arg": {"tool": "send", "name": "to", "pattern": "ops"}})
+tools = CapabilityTools(tools, secret, cap, clock)
+```
+"""
+frameworks = "Macaroons; OAuth scopes with resource indicators; CaMeL capabilities."
+
+[[solutions]]
+id = "sandbox"
+name = "Process and network sandboxing"
+status = "documented"
+summary = "Confine the agent's code execution and network egress at the operating-system level."
+advantages = ["Contains what tool-level policy cannot see (shell, files, sockets)", "Reported to reduce approval prompts substantially"]
+limitations = ["Infrastructure, not library code", "Does not stop misuse of an allowed channel"]
+use_when = ["Agents that execute code or shell commands"]
+avoid_when = ["Never a reason to skip it for such agents"]
+frameworks = "Container and micro-VM sandboxes; Claude Code sandboxing. Out of scope here; see known limitations."

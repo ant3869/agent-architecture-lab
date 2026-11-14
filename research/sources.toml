@@ -1,0 +1,629 @@
+# Bibliography for the Agent Architecture Lab.
+# `verified` records how each entry was checked on 2026-11-14 (see scripts/verify_sources.py):
+#   content     - the page was fetched and the specific claim in `note` was read in the source
+#   reachable   - the URL resolved; the description comes from prior knowledge
+#   unverified  - could not be fetched automatically
+
+[[source]]
+key = "yao2022react"
+kind = "paper"
+title = "ReAct: Synergizing Reasoning and Acting in Language Models"
+authors = "Shunyu Yao et al. (7 authors)"
+year = 2022
+arxiv = "2210.03629"
+url = "https://arxiv.org/abs/2210.03629"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "wang2023plansolve"
+kind = "paper"
+title = "Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models"
+authors = "Lei Wang et al. (7 authors)"
+year = 2023
+arxiv = "2305.04091"
+url = "https://arxiv.org/abs/2305.04091"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "xu2023rewoo"
+kind = "paper"
+title = "ReWOO: Decoupling Reasoning from Observations for Efficient Augmented Language Models"
+authors = "Binfeng Xu et al. (6 authors)"
+year = 2023
+arxiv = "2305.18323"
+url = "https://arxiv.org/abs/2305.18323"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "kim2023llmcompiler"
+kind = "paper"
+title = "An LLM Compiler for Parallel Function Calling"
+authors = "Sehoon Kim et al. (7 authors)"
+year = 2023
+arxiv = "2312.04511"
+url = "https://arxiv.org/abs/2312.04511"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "shinn2023reflexion"
+kind = "paper"
+title = "Reflexion: Language Agents with Verbal Reinforcement Learning"
+authors = "Noah Shinn et al. (6 authors)"
+year = 2023
+arxiv = "2303.11366"
+url = "https://arxiv.org/abs/2303.11366"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "yao2023tot"
+kind = "paper"
+title = "Tree of Thoughts: Deliberate Problem Solving with Large Language Models"
+authors = "Shunyu Yao et al. (7 authors)"
+year = 2023
+arxiv = "2305.10601"
+url = "https://arxiv.org/abs/2305.10601"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "wang2024codeact"
+kind = "paper"
+title = "Executable Code Actions Elicit Better LLM Agents"
+authors = "Xingyao Wang et al. (7 authors)"
+year = 2024
+arxiv = "2402.01030"
+url = "https://arxiv.org/abs/2402.01030"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "wu2023autogen"
+kind = "paper"
+title = "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation"
+authors = "Qingyun Wu et al. (14 authors)"
+year = 2023
+arxiv = "2308.08155"
+url = "https://arxiv.org/abs/2308.08155"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "hong2023metagpt"
+kind = "paper"
+title = "MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework"
+authors = "Sirui Hong et al. (15 authors)"
+year = 2023
+arxiv = "2308.00352"
+url = "https://arxiv.org/abs/2308.00352"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "li2023camel"
+kind = "paper"
+title = "CAMEL: Communicative Agents for \"Mind\" Exploration of Large Language Model Society"
+authors = "Guohao Li et al. (5 authors)"
+year = 2023
+arxiv = "2303.17760"
+url = "https://arxiv.org/abs/2303.17760"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "fourney2024magentic"
+kind = "paper"
+title = "Magentic-One: A Generalist Multi-Agent System for Solving Complex Tasks"
+authors = "Adam Fourney et al. (20 authors)"
+year = 2024
+arxiv = "2411.04468"
+url = "https://arxiv.org/abs/2411.04468"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "cemri2025mast"
+kind = "paper"
+title = "Why Do Multi-Agent LLM Systems Fail?"
+authors = "Mert Cemri et al. (13 authors)"
+year = 2025
+arxiv = "2503.13657"
+url = "https://arxiv.org/abs/2503.13657"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "packer2023memgpt"
+kind = "paper"
+title = "MemGPT: Towards LLMs as Operating Systems"
+authors = "Charles Packer et al. (7 authors)"
+year = 2023
+arxiv = "2310.08560"
+url = "https://arxiv.org/abs/2310.08560"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "park2023generative"
+kind = "paper"
+title = "Generative Agents: Interactive Simulacra of Human Behavior"
+authors = "Joon Sung Park et al. (6 authors)"
+year = 2023
+arxiv = "2304.03442"
+url = "https://arxiv.org/abs/2304.03442"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "chen2023frugalgpt"
+kind = "paper"
+title = "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance"
+authors = "Lingjiao Chen et al. (3 authors)"
+year = 2023
+arxiv = "2305.05176"
+url = "https://arxiv.org/abs/2305.05176"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "ong2024routellm"
+kind = "paper"
+title = "RouteLLM: Learning to Route LLMs with Preference Data"
+authors = "Isaac Ong et al. (8 authors)"
+year = 2024
+arxiv = "2406.18665"
+url = "https://arxiv.org/abs/2406.18665"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "jimenez2023swebench"
+kind = "paper"
+title = "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"
+authors = "Carlos E. Jimenez et al. (7 authors)"
+year = 2023
+arxiv = "2310.06770"
+url = "https://arxiv.org/abs/2310.06770"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "liu2023agentbench"
+kind = "paper"
+title = "AgentBench: Evaluating LLMs as Agents"
+authors = "Xiao Liu et al. (22 authors)"
+year = 2023
+arxiv = "2308.03688"
+url = "https://arxiv.org/abs/2308.03688"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "yao2024taubench"
+kind = "paper"
+title = "tau-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"
+authors = "Shunyu Yao et al. (4 authors)"
+year = 2024
+arxiv = "2406.12045"
+url = "https://arxiv.org/abs/2406.12045"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "mialon2023gaia"
+kind = "paper"
+title = "GAIA: a benchmark for General AI Assistants"
+authors = "Grégoire Mialon et al. (6 authors)"
+year = 2023
+arxiv = "2311.12983"
+url = "https://arxiv.org/abs/2311.12983"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "debenedetti2025camel"
+kind = "paper"
+title = "Defeating Prompt Injections by Design"
+authors = "Edoardo Debenedetti et al. (10 authors)"
+year = 2025
+arxiv = "2503.18813"
+url = "https://arxiv.org/abs/2503.18813"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "greshake2023injection"
+kind = "paper"
+title = "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection"
+authors = "Kai Greshake et al. (6 authors)"
+year = 2023
+arxiv = "2302.12173"
+url = "https://arxiv.org/abs/2302.12173"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "gan2025ragmcp"
+kind = "paper"
+title = "RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation"
+authors = "Tiantian Gan et al. (2 authors)"
+year = 2025
+arxiv = "2505.03275"
+url = "https://arxiv.org/abs/2505.03275"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "qin2023toolllm"
+kind = "paper"
+title = "ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs"
+authors = "Yujia Qin et al. (19 authors)"
+year = 2023
+arxiv = "2307.16789"
+url = "https://arxiv.org/abs/2307.16789"
+verified = "content"
+note = "Title, first author and year confirmed against the arXiv API; quantitative claims quoted in research/ are taken from the abstract."
+
+[[source]]
+key = "langgraph-overview"
+kind = "docs"
+title = "LangGraph overview"
+authors = "LangChain"
+year = 2026
+url = "https://docs.langchain.com/oss/python/langgraph/overview"
+verified = "content"
+note = "Describes LangGraph as an orchestration runtime: durable execution, streaming, human-in-the-loop, persistence."
+
+[[source]]
+key = "langgraph-persistence"
+kind = "docs"
+title = "LangGraph persistence (checkpointers and stores)"
+authors = "LangChain"
+year = 2026
+url = "https://docs.langchain.com/oss/python/langgraph/persistence"
+verified = "content"
+note = "Checkpointers persist a thread's graph state; stores persist cross-thread data; thread_id addresses a thread."
+
+[[source]]
+key = "langgraph-interrupts"
+kind = "docs"
+title = "LangGraph interrupts"
+authors = "LangChain"
+year = 2026
+url = "https://docs.langchain.com/oss/python/langgraph/interrupts"
+verified = "content"
+note = "interrupt() pauses a node; Command(resume=...) resumes; the node restarts from its beginning on resume."
+
+[[source]]
+key = "openai-agents-docs"
+kind = "docs"
+title = "OpenAI Agents SDK documentation"
+authors = "OpenAI"
+year = 2026
+url = "https://openai.github.io/openai-agents-python/"
+verified = "content"
+note = "Core primitives: agents, handoffs, guardrails, sessions, tracing."
+
+[[source]]
+key = "openai-agents-handoffs"
+kind = "docs"
+title = "OpenAI Agents SDK: Handoffs"
+authors = "OpenAI"
+year = 2026
+url = "https://openai.github.io/openai-agents-python/handoffs/"
+verified = "content"
+note = "Handoffs are represented as tools to the LLM (transfer_to_<agent>); the receiving agent sees the conversation history unless an input_filter changes it."
+
+[[source]]
+key = "openai-agents-guardrails"
+kind = "docs"
+title = "OpenAI Agents SDK: Guardrails"
+authors = "OpenAI"
+year = 2026
+url = "https://openai.github.io/openai-agents-python/guardrails/"
+verified = "content"
+note = "Input, output and tool guardrails; tripwires."
+
+[[source]]
+key = "openai-agents-tracing"
+kind = "docs"
+title = "OpenAI Agents SDK: Tracing"
+authors = "OpenAI"
+year = 2026
+url = "https://openai.github.io/openai-agents-python/tracing/"
+verified = "content"
+note = "Tracing is enabled by default and can be disabled by environment variable."
+
+[[source]]
+key = "openai-swarm"
+kind = "repo"
+title = "Swarm (experimental, educational)"
+authors = "OpenAI"
+year = 2024
+url = "https://github.com/openai/swarm"
+verified = "content"
+note = "README: Swarm is replaced by the OpenAI Agents SDK; two primitives, Agents and handoffs; stateless between calls."
+
+[[source]]
+key = "crewai-processes"
+kind = "docs"
+title = "CrewAI: Processes"
+authors = "CrewAI"
+year = 2026
+url = "https://docs.crewai.com/en/concepts/processes"
+verified = "content"
+note = "Sequential and hierarchical processes; hierarchical requires manager_llm or manager_agent."
+
+[[source]]
+key = "crewai-flows"
+kind = "docs"
+title = "CrewAI: Flows"
+authors = "CrewAI"
+year = 2026
+url = "https://docs.crewai.com/en/concepts/flows"
+verified = "content"
+note = "Flows are structured, event-driven workflows with managed state (@start, @listen)."
+
+[[source]]
+key = "autogen-repo"
+kind = "repo"
+title = "microsoft/autogen README"
+authors = "Microsoft"
+year = 2026
+url = "https://github.com/microsoft/autogen"
+verified = "content"
+note = "README states AutoGen is archived/maintenance-only and directs new users to Microsoft Agent Framework; Core API is event-driven message passing."
+
+[[source]]
+key = "ms-agent-framework"
+kind = "docs"
+title = "Microsoft Agent Framework overview"
+authors = "Microsoft"
+year = 2026
+url = "https://learn.microsoft.com/en-us/agent-framework/overview/"
+verified = "content"
+note = "Described as the direct successor to Semantic Kernel and AutoGen, adding graph-based workflows."
+
+[[source]]
+key = "mcp-spec"
+kind = "spec"
+title = "Model Context Protocol specification"
+authors = "Agentic AI Foundation / MCP project"
+year = 2026
+url = "https://modelcontextprotocol.io/specification/latest"
+verified = "reachable"
+note = "Entry point for the current revision."
+
+[[source]]
+key = "mcp-changelog-2025-11-25"
+kind = "spec"
+title = "MCP specification 2025-11-25: key changes"
+authors = "MCP project"
+year = 2025
+url = "https://modelcontextprotocol.io/specification/2025-11-25/changelog"
+verified = "content"
+note = "Adds experimental tasks, URL-mode elicitation, sampling with tools, incremental scope consent; input validation errors should be tool execution errors."
+
+[[source]]
+key = "mcp-changelog-latest"
+kind = "spec"
+title = "MCP specification 2026-07-28: key changes"
+authors = "MCP project"
+year = 2026
+url = "https://modelcontextprotocol.io/specification/latest/changelog"
+verified = "content"
+note = "Removes protocol-level sessions and the initialize handshake (stateless), adds server/discover, moves tasks to an extension, introduces multi round-trip requests."
+
+[[source]]
+key = "mcp-tools"
+kind = "spec"
+title = "MCP specification: Tools"
+authors = "MCP project"
+year = 2026
+url = "https://modelcontextprotocol.io/specification/latest/server/tools"
+verified = "content"
+note = "There SHOULD always be a human in the loop able to deny tool invocations; tool annotations are untrusted unless from trusted servers; outputSchema/structuredContent."
+
+[[source]]
+key = "mcp-security"
+kind = "spec"
+title = "MCP specification: Security best practices"
+authors = "MCP project"
+year = 2026
+url = "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices"
+verified = "content"
+note = "Covers confused deputy, token passthrough and SSRF attacks with mitigations."
+
+[[source]]
+key = "a2a-spec"
+kind = "spec"
+title = "Agent2Agent (A2A) Protocol specification"
+authors = "A2A project / Linux Foundation"
+year = 2026
+url = "https://a2a-protocol.org/latest/specification/"
+verified = "content"
+note = "Latest released version 1.0.0; agent card at /.well-known/agent-card.json; task states; JSON-RPC, gRPC and HTTP+JSON bindings."
+
+[[source]]
+key = "anthropic-bea"
+kind = "blog"
+title = "Building effective agents"
+authors = "Anthropic"
+year = 2024
+url = "https://www.anthropic.com/engineering/building-effective-agents"
+verified = "content"
+note = "Distinguishes workflows (predefined code paths) from agents (LLM-directed); published 2024-12-19."
+
+[[source]]
+key = "anthropic-multiagent"
+kind = "blog"
+title = "How we built our multi-agent research system"
+authors = "Anthropic"
+year = 2025
+url = "https://www.anthropic.com/engineering/multi-agent-research-system"
+verified = "content"
+note = "Multi-agent beat single-agent by 90.2% on an internal research eval; agents use ~4x and multi-agent ~15x the tokens of chat; token usage explains 80% of variance on BrowseComp."
+
+[[source]]
+key = "anthropic-context"
+kind = "blog"
+title = "Effective context engineering for AI agents"
+authors = "Anthropic"
+year = 2025
+url = "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+verified = "content"
+note = "Defines context rot; describes compaction, structured note-taking and multi-agent architectures as long-horizon techniques."
+
+[[source]]
+key = "anthropic-advanced-tools"
+kind = "blog"
+title = "Introducing advanced tool use on the Claude Developer Platform"
+authors = "Anthropic"
+year = 2025
+url = "https://www.anthropic.com/engineering/advanced-tool-use"
+verified = "content"
+note = "Tool Search Tool: reported 85% reduction in token usage; programmatic tool calling: 43,588 -> 27,297 tokens (37%)."
+
+[[source]]
+key = "anthropic-sandboxing"
+kind = "blog"
+title = "Beyond permission prompts: making Claude Code more secure and autonomous"
+authors = "Anthropic"
+year = 2025
+url = "https://www.anthropic.com/engineering/claude-code-sandboxing"
+verified = "content"
+note = "Reports sandboxing reduced permission prompts by 84% in internal usage."
+
+[[source]]
+key = "chroma-context-rot"
+kind = "report"
+title = "Context Rot: How Increasing Input Tokens Impacts LLM Performance"
+authors = "Chroma Research"
+year = 2025
+url = "https://research.trychroma.com/context-rot"
+verified = "content"
+note = "Evaluates 18 LLMs; performance grows increasingly unreliable as input length grows."
+
+[[source]]
+key = "cognition-multiagents"
+kind = "blog"
+title = "Don't Build Multi-Agents"
+authors = "Cognition"
+year = 2025
+url = "https://cognition.ai/blog/dont-build-multi-agents"
+verified = "content"
+note = "Two principles: share context; actions carry implicit decisions."
+
+[[source]]
+key = "willison-trifecta"
+kind = "blog"
+title = "The lethal trifecta for AI agents: private data, untrusted content, and external communication"
+authors = "Simon Willison"
+year = 2025
+url = "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+verified = "content"
+note = "Names the combination of capabilities that makes data exfiltration by prompt injection possible."
+
+[[source]]
+key = "owasp-llm-top10"
+kind = "standard"
+title = "OWASP Top 10 for LLM Applications 2025"
+authors = "OWASP GenAI Security Project"
+year = 2025
+url = "https://genai.owasp.org/llm-top-10/"
+verified = "content"
+note = "LLM01 Prompt Injection, LLM06 Excessive Agency among the ten."
+
+[[source]]
+key = "temporal-workflow-execution"
+kind = "docs"
+title = "Temporal: Workflow Execution"
+authors = "Temporal Technologies"
+year = 2026
+url = "https://docs.temporal.io/workflow-execution"
+verified = "content"
+note = "Replay re-executes workflow code, checking generated commands against the event history; requires deterministic workflow code."
+
+[[source]]
+key = "restate-docs"
+kind = "docs"
+title = "Restate documentation"
+authors = "Restate"
+year = 2026
+url = "https://docs.restate.dev/"
+verified = "content"
+note = "Durable execution: code stores completed steps and resumes from where it left off after failures."
+
+[[source]]
+key = "dbos-docs"
+kind = "docs"
+title = "DBOS documentation"
+authors = "DBOS"
+year = 2026
+url = "https://docs.dbos.dev/"
+verified = "reachable"
+note = "Durable workflows checkpointed in a database."
+
+[[source]]
+key = "otel-genai-agent-spans"
+kind = "spec"
+title = "OpenTelemetry semantic conventions for GenAI agent and framework spans"
+authors = "OpenTelemetry"
+year = 2026
+url = "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md"
+verified = "content"
+note = "Status: Development. Defines create_agent, invoke_agent, plan and execute_tool spans and gen_ai.* attributes."
+
+[[source]]
+key = "aws-backoff-jitter"
+kind = "blog"
+title = "Exponential Backoff And Jitter"
+authors = "AWS Architecture Blog (Marc Brooker)"
+year = 2015
+url = "https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/"
+verified = "content"
+note = "Defines Full Jitter, Equal Jitter and Decorrelated Jitter."
+
+[[source]]
+key = "fowler-circuit-breaker"
+kind = "blog"
+title = "CircuitBreaker"
+authors = "Martin Fowler"
+year = 2014
+url = "https://martinfowler.com/bliki/CircuitBreaker.html"
+verified = "content"
+note = "Wrap a protected call; after a failure threshold the breaker trips and further calls return an error without making the call."
+
+[[source]]
+key = "stripe-idempotency"
+kind = "blog"
+title = "Designing robust and predictable APIs with idempotency"
+authors = "Stripe (Brandur Leach)"
+year = 2017
+url = "https://stripe.com/blog/idempotency"
+verified = "content"
+note = "Client-generated idempotency keys let a server recognise retries of the same operation."
+
+[[source]]
+key = "macaroons"
+kind = "paper"
+title = "Macaroons: Cookies with Contextual Caveats for Decentralized Authorization in the Cloud"
+authors = "Birgisson et al., NDSS"
+year = 2014
+url = "https://research.google/pubs/macaroons-cookies-with-contextual-caveats-for-decentralized-authorization-in-the-cloud/"
+verified = "reachable"
+note = "Bearer credentials with chained-HMAC caveats that holders can add but not remove."
+
+[[source]]
+key = "sagas"
+kind = "paper"
+title = "Sagas"
+authors = "Hector Garcia-Molina and Kenneth Salem, SIGMOD"
+year = 1987
+url = "https://dl.acm.org/doi/10.1145/38713.38742"
+verified = "unverified"
+note = "Long-lived transactions as a sequence of steps with compensating actions. Publisher page blocks automated fetches; cited from prior knowledge."

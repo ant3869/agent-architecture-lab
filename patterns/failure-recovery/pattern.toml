@@ -1,0 +1,121 @@
+id = "failure-recovery"
+order = 6
+title = "Failure handling and retries"
+tagline = "Who retries a failed tool call, and when a retry is unsafe."
+experiment = "recovery"
+research = ["aws-backoff-jitter", "fowler-circuit-breaker", "stripe-idempotency", "mcp-changelog-2025-11-25", "sagas"]
+problem = """
+Tools fail transiently, go down for minutes, and sometimes time out after having done the work. An agent has three places to respond: the model can read the error and try again, the runtime can retry underneath the model, or a breaker can stop calling a dead dependency and route elsewhere. Choosing wrongly wastes tokens, hammers a struggling backend, or performs a side effect twice.
+"""
+applications = ["Agents over rate-limited or flaky APIs", "Agents with redundant data sources", "Any agent calling non-idempotent endpoints"]
+decision = """
+Send semantic errors (bad arguments, not found) to the model: only it can fix them. Retry transient infrastructure errors in the runtime with bounded, jittered backoff. Put a breaker in front of dependencies that can be down for a while, with a fallback if one exists. Never retry a non-idempotent call without an idempotency key.
+"""
+
+[[solutions]]
+id = "model"
+name = "Model-mediated retry"
+status = "implemented"
+summary = "Return the error as the observation and let the model decide to call again."
+implementation = "src/agentlab/loops/react.py"
+example = "examples/10_failure_recovery.py"
+tests = "tests/test_recovery.py"
+result_arch = ["model-mediated"]
+advantages = ["No extra machinery", "The right handler for errors the model caused"]
+limitations = ["Every retry is a full model call over the transcript", "No backoff: it retries as fast as the model answers", "A lost reply on a non-idempotent call becomes a duplicate effect"]
+performance = "Measured under 30% transient faults: {{recovery|transient 30%|model-mediated|model_calls_mean|1}} model calls and {{recovery|transient 30%|model-mediated|total_tokens_mean|k}} tokens per task."
+complexity = "None."
+reliability = "Completes if the fault clears within the iteration budget."
+security = "Error text is model input: do not put secrets or untrusted detail in it."
+use_when = ["Validation and semantic errors"]
+avoid_when = ["Infrastructure faults", "Non-idempotent tools"]
+frameworks = "Default behaviour of tool-calling loops; MCP directs validation errors here."
+
+[[solutions]]
+id = "backoff"
+name = "Runtime retry with exponential backoff and jitter"
+status = "implemented"
+summary = "A wrapper under the model retries retryable errors on idempotent calls with capped, jittered delays."
+implementation = "src/agentlab/recovery/policies.py"
+example = "examples/10_failure_recovery.py"
+tests = "tests/test_recovery.py"
+result_arch = ["backoff", "backoff+idem"]
+diagram = '''
+flowchart LR
+  M[Model] --> R[Retry wrapper]
+  R -->|attempt| B[(Backend)]
+  B -->|retryable error| R
+  R -->|wait base * 2^n * jitter| R
+  B -->|ok or non-retryable| M
+'''
+advantages = ["Transient faults never reach the model: no tokens spent", "Jitter avoids synchronised retries", "Refuses to retry non-idempotent calls unless they carry a key"]
+limitations = ["Keeps hammering a backend that is down", "Adds latency the model cannot see"]
+performance = "Measured under 30% transient faults: {{recovery|transient 30%|backoff|model_calls_mean|1}} model calls and {{recovery|transient 30%|backoff|total_tokens_mean|k}} tokens per task."
+complexity = "Small; part of a {{complexity|*|retry / breaker / idempotency|sloc|0}}-SLOC middleware module."
+reliability = "Through a 58s outage it made {{recovery|outage 58s|backoff|backend_calls_mean|0}} backend calls and took {{recovery|outage 58s|backoff|sim_ms_mean|s}}s."
+security = "Bound attempts and total delay so a failing dependency cannot be used to stall the agent."
+use_when = ["Transient errors on idempotent calls"]
+avoid_when = ["Long outages (add a breaker)", "Non-idempotent calls without keys"]
+integration = """
+```python
+from agentlab.recovery.policies import RetryingTools, RetryPolicy
+tools = RetryingTools(registry, clock, RetryPolicy(max_attempts=4, base_ms=100, cap_ms=2000))
+```
+"""
+frameworks = "SDK-level retries (Anthropic and OpenAI clients); LangGraph node retry policies; Temporal activity retries."
+
+[[solutions]]
+id = "breaker"
+name = "Circuit breaker with fallback"
+status = "implemented"
+summary = "After repeated failures stop calling the dependency for a cool-down, route to a fallback if there is one, then probe."
+implementation = "src/agentlab/recovery/policies.py"
+example = "examples/10_failure_recovery.py"
+tests = "tests/test_recovery.py"
+result_arch = ["breaker+fallback", "breaker+fallback+idem"]
+diagram = '''
+stateDiagram-v2
+  [*] --> closed
+  closed --> open: N consecutive retryable failures
+  open --> half_open: cool-down elapsed
+  half_open --> closed: probe succeeds
+  half_open --> open: probe fails
+  open --> open: call short-circuited (fallback or fast failure)
+'''
+advantages = ["Fails fast instead of waiting on timeouts", "Protects the struggling dependency", "A fallback keeps the agent productive through an outage"]
+limitations = ["Needs tuning (threshold, cool-down)", "A fallback with different freshness or semantics can introduce silent errors", "Per-process state unless shared"]
+performance = "Through a 58s outage: {{recovery|outage 58s|breaker+fallback|backend_calls_mean|0}} backend calls, {{recovery|outage 58s|breaker+fallback|sim_ms_mean|s}}s, {{recovery|outage 58s|breaker+fallback|model_calls_mean|0}} model calls."
+complexity = "A three-state machine per tool."
+reliability = "Caller errors do not trip it; only retryable failures count."
+security = "The fallback tool is hidden from the model: routing is a runtime decision."
+use_when = ["Dependencies that can be down for minutes", "A replica or degraded path exists"]
+avoid_when = ["Single-shot scripts", "No meaningful fallback and failing slowly is acceptable"]
+integration = """
+```python
+from agentlab.recovery.policies import CircuitBreakerTools
+tools = CircuitBreakerTools(RetryingTools(registry, clock), clock, threshold=3, cooldown_ms=5000, fallbacks={"lookup": "lookup_replica"})
+```
+"""
+frameworks = "Resilience libraries (resilience4j, Polly); service meshes."
+
+[[solutions]]
+id = "idempotent"
+name = "Idempotency keys for ambiguous outcomes"
+status = "implemented"
+summary = "Derive a key from the logical operation and send it with every side-effecting call, so a repeat after a lost reply is collapsed by the backend."
+implementation = "src/agentlab/recovery/policies.py"
+example = "examples/10_failure_recovery.py"
+tests = "tests/test_recovery.py"
+result_arch = ["backoff+idem", "breaker+fallback+idem"]
+advantages = ["The only fix for timeouts that hide a successful effect", "Makes both runtime and model retries safe"]
+limitations = ["Requires backend support", "The key must be stable across retries and distinct across operations"]
+reliability = "Measured with 50% lost replies on `send`: {{recovery|ambiguous timeout 50%|backoff|success_rate|%}} success without keys, {{recovery|ambiguous timeout 50%|backoff+idem|success_rate|%}} with them."
+use_when = ["Every non-idempotent tool"]
+avoid_when = ["Pure reads"]
+integration = """
+```python
+from agentlab.recovery.policies import IdempotentTools
+tools = IdempotentTools(tools, namespace=run_id)     # outermost wrapper
+```
+"""
+frameworks = "Idempotency-Key headers; the MCP example server in this repo accepts `idempotency_key`."

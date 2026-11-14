@@ -1,0 +1,32 @@
+{
+ "note": "Harness overhead on this machine for 29-step tasks; excludes all simulated latency. Not reproducible across machines.",
+ "python": "3.13.18",
+ "platform": "Linux x86_64",
+ "rows": [
+  {
+   "arch": "react",
+   "wall_ms_per_run": 2.371,
+   "peak_alloc_kb": 60.1
+  },
+  {
+   "arch": "plan_execute",
+   "wall_ms_per_run": 0.61,
+   "peak_alloc_kb": 68.6
+  },
+  {
+   "arch": "verified_graph",
+   "wall_ms_per_run": 1.116,
+   "peak_alloc_kb": 73.3
+  },
+  {
+   "arch": "supervisor",
+   "wall_ms_per_run": 2.254,
+   "peak_alloc_kb": 53.2
+  },
+  {
+   "arch": "handoff",
+   "wall_ms_per_run": 3.59,
+   "peak_alloc_kb": 142.2
+  }
+ ]
+}

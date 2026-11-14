@@ -1,0 +1,163 @@
+id = "execution-loops"
+order = 1
+title = "Agent execution loops"
+tagline = "How one agent turns a goal into a sequence of tool calls."
+experiment = "loops"
+research = ["yao2022react", "wang2023plansolve", "xu2023rewoo", "kim2023llmcompiler", "shinn2023reflexion", "wang2024codeact", "anthropic-bea"]
+problem = """
+An agent must complete a multi-step task whose later steps depend on values only discoverable by calling tools, in an environment that can surprise it (data has moved, a call was malformed) and where the last steps have irreversible effects. The loop decides how often the model is consulted, what it sees each time, and whether anything checks its work before an effect is committed.
+"""
+applications = [
+  "Tool-using assistants (support, operations, data lookup and update)",
+  "Coding and DevOps agents that read state, compute, then change something",
+  "Back-office automations where a wrong write or a wrong message is costly",
+]
+decision = """
+Start with ReAct when steps are few and mistakes are cheap or visible. Move to plan-and-execute when the task shape is predictable and cost or latency matters. Use the verified graph whenever a wrong side effect is expensive: it is the only one of the three that can catch an error the tools did not report.
+"""
+
+[[solutions]]
+id = "react"
+name = "ReAct (interleaved reason, act, observe)"
+status = "implemented"
+summary = "One model call per tool call. The model sees every observation before choosing the next action."
+implementation = "src/agentlab/loops/react.py"
+example = "examples/01_react_loop.py"
+tests = "tests/test_loops.py"
+result_arch = ["react"]
+diagram = '''
+flowchart LR
+  G([Goal]) --> M[Model: choose next action]
+  M -->|tool call| T[Execute tool]
+  T -->|observation appended to context| M
+  M -->|no tool call| F([Final answer])
+'''
+advantages = [
+  "Adapts to surprises for free: an error is just the next observation",
+  "Smallest implementation; no plan format to design or parse",
+  "Works with any tool-calling model API as-is",
+]
+limitations = [
+  "One model call per step over a growing transcript: total tokens grow quadratically with task length",
+  "Nothing checks a call that succeeds with the wrong meaning; silent errors flow straight into side effects",
+  "No global view: cannot reorder or parallelise steps",
+]
+performance = "Model calls = steps + 1 (plus one per recoverable error). Measured: {{loops|clean|react|model_calls_mean|0}} calls and about {{loops|clean|react|total_tokens_mean|k}} tokens for a 15-step task; about {{loops|long-noisy|react|total_tokens_mean|k}} tokens at 29 steps."
+complexity = "Lowest. {{complexity|*|react|sloc|0}} SLOC, {{complexity|*|react|branch_points|0}} branch points."
+reliability = "Recovers from every error a tool reports. Blind to errors a tool does not report. Needs an iteration cap to bound loops."
+security = "The model reads all tool output and decides the next call, so injected text in an observation can steer it directly. Pair with argument-level authorization."
+use_when = ["Short tasks, exploratory tasks, or unknown task shape", "Errors are loud (tools validate) or cheap", "You need the simplest thing that works"]
+avoid_when = ["Long tasks where token cost matters", "Side effects are irreversible and nothing else verifies them"]
+integration = """
+```python
+from agentlab.core.runtime import Runtime
+from agentlab.loops.react import ReActLoop
+
+rt = Runtime(model, tools)                 # any Model + any ToolExecutor
+result = ReActLoop(rt, memory=policy, max_iters=80, on_step=checkpoint).run(goal_message)
+```
+`memory` bounds the context (see context-memory), `on_step` is the snapshot hook (see durable-execution). To run on a real model use `agentlab.integrations.anthropic_model.AnthropicModel`.
+"""
+frameworks = "LangGraph prebuilt ReAct agent; OpenAI Agents SDK runner loop; CrewAI agent executor; any manual tool-use loop."
+
+[[solutions]]
+id = "plan_execute"
+name = "Plan-and-Execute with symbolic references"
+status = "implemented"
+summary = "One call writes the whole plan with placeholders for values not yet known; code executes it and calls the model again only when a step fails."
+implementation = "src/agentlab/loops/plan_execute.py"
+example = "examples/02_plan_execute.py"
+tests = "tests/test_loops.py"
+result_arch = ["plan_execute"]
+diagram = '''
+flowchart LR
+  G([Goal]) --> P[Model: plan all steps, args may be $ref]
+  P --> X[Executor: resolve refs, run next step]
+  X -->|ok, more steps| X
+  X -->|step failed| R[Model: replan remaining steps]
+  R --> X
+  X -->|plan done| F[Model: finalize]
+'''
+advantages = [
+  "Model calls are constant in task length when nothing goes wrong (plan + finalize)",
+  "Intermediate values never enter the model's context; they are passed by reference",
+  "The plan is an inspectable artefact: it can be reviewed, approved or parallelised before anything runs",
+]
+limitations = [
+  "Every surprise costs a full replan call over the whole transcript",
+  "Needs a plan representation with references, and a model that can produce it reliably",
+  "As blind to silent errors as ReAct",
+]
+performance = "Measured: {{loops|clean|plan_execute|model_calls_mean|0}} model calls and about {{loops|clean|plan_execute|total_tokens_mean|k}} tokens on a clean 15-step task, against {{loops|clean|react|total_tokens_mean|k}} for ReAct. With two surprises: {{loops|surprises|plan_execute|model_calls_mean|0}} calls, about {{loops|surprises|plan_execute|total_tokens_mean|k}} tokens."
+complexity = "Low. {{complexity|*|plan_execute|sloc|0}} SLOC; the complexity moves into the plan format."
+reliability = "Identical task success to ReAct under identical model errors (measured). Bounded by a replan budget."
+security = "Plan-then-execute fixes the control flow before untrusted tool output is read, which is the property data-flow defences such as CaMeL build on. Replanning re-opens that door."
+use_when = ["Task shape is predictable", "Cost or latency dominates", "A human or policy should review the plan before execution"]
+avoid_when = ["Highly exploratory tasks where each observation changes what to do next", "Environments with frequent surprises"]
+integration = """
+```python
+from agentlab.loops.plan_execute import PlanExecuteLoop
+result = PlanExecuteLoop(rt, max_replans=12).run(goal_message)
+```
+The model must answer `plan` / `replan` requests with a list of `ToolCall`s whose args may contain `{"$ref": "<step id>"}`.
+"""
+frameworks = "ReWOO and LLMCompiler (papers); LangGraph plan-and-execute templates; CrewAI Flows with a planning step."
+
+[[solutions]]
+id = "verified_graph"
+name = "Verified state-machine loop"
+status = "implemented"
+summary = "An explicit graph (plan, execute, verify, repair) that refuses to run any side-effecting call until upstream steps and the call itself pass an independent check."
+implementation = "src/agentlab/loops/verified_graph.py"
+example = "examples/03_verified_state_machine.py"
+tests = "tests/test_loops.py"
+result_arch = ["verified_graph", "verified_graph[all]"]
+diagram = '''
+flowchart LR
+  P[plan] --> G{gate}
+  G -->|next step is a read| E[execute]
+  G -->|next step has a side effect| V[verify upstream + proposed call]
+  V -->|ok| E
+  V -->|rejected| R[repair: invalidate, replan]
+  E -->|ok| G
+  E -->|tool error| RP[replan]
+  R --> G
+  RP --> G
+  G -->|plan done| F[finalize]
+'''
+advantages = [
+  "Catches silent errors before they become irreversible effects",
+  "Control flow is code: the verify-before-effect invariant cannot be talked out of by a prompt",
+  "Every node boundary is a checkpoint, so durability and human approval come almost free",
+]
+limitations = [
+  "More model calls than plan-and-execute: one verification per side effect, plus repairs",
+  "Only as good as the verifier; a verifier that shares the actor's blind spot adds cost and no safety",
+  "Largest implementation and needs a graph engine",
+]
+performance = "Measured: {{loops|clean|verified_graph|model_calls_mean|0}} model calls and about {{loops|clean|verified_graph|total_tokens_mean|k}} tokens on a clean 15-step task. Auditing after every step instead of only before effects takes {{loops|clean|verified_graph[all]|model_calls_mean|0}} calls and changed success under noise from {{loops|noisy|verified_graph|success_rate|%}} to {{loops|noisy|verified_graph[all]|success_rate|%}}."
+complexity = "Highest of the three. {{complexity|*|verified_graph|sloc|0}} SLOC plus an {{complexity|*|(graph engine)|sloc|0}}-SLOC graph engine."
+reliability = "Measured at 8% slips (half silent): {{loops|noisy|verified_graph|success_rate|%}} success versus {{loops|noisy|react|success_rate|%}} for the other two loops on 15-step tasks, and {{loops|long-noisy|verified_graph|success_rate|%}} versus {{loops|long-noisy|react|success_rate|%}} at 29 steps. With a perfect verifier it never committed a wrong effect in tests."
+security = "The gate is a natural enforcement point: approval, capability checks and verification all sit in front of the same edge."
+use_when = ["Side effects are expensive or irreversible", "An independent check exists (tests, a schema, a second model, a read-back)", "You already need checkpoints or approvals"]
+avoid_when = ["Read-only tasks", "No verifier better than chance is available"]
+integration = """
+```python
+from agentlab.loops.verified_graph import VerifiedGraphLoop
+loop = VerifiedGraphLoop(rt, verify="effects", checkpointer=store, thread_id="run-1")
+result = loop.run(goal_message)      # after a crash: loop.resume()
+```
+The model must also answer `verify` requests with `{"invalid": [...], "proposed_ok": bool}`. Replace the model verifier with deterministic checks wherever you have them.
+"""
+frameworks = "LangGraph StateGraph with a checkpointer; CrewAI Flows; Microsoft Agent Framework graph workflows; Anthropic's evaluator-optimizer workflow."
+
+[[solutions]]
+id = "reflexion"
+name = "Trial-level retry with reflection (Reflexion)"
+status = "documented"
+summary = "Run the whole task, evaluate the outcome, write a verbal lesson, reset the environment and try again."
+advantages = ["No per-step verifier needed, only an end-of-task evaluator", "Strong published results on code generation"]
+limitations = ["Requires an environment that can be reset; unusable once a real side effect has happened", "Multiplies cost by the number of trials"]
+use_when = ["Sandboxed or simulated tasks with a cheap, reliable final check (tests)"]
+avoid_when = ["Live systems with irreversible effects"]
+frameworks = "Reflexion (paper)."

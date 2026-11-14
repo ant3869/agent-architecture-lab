@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install library with all extras
+        run: pip install -e ".[dev,mcp,anthropic]"
+      - name: Build the TypeScript MCP server (needed by the interop tests)
+        working-directory: integrations/mcp-tool-server
+        run: npm ci && npm run build
+      - name: Tests (unit, examples, reproducibility, cross-language interop)
+        run: pytest
+      - name: Generated artefacts are up to date
+        run: python scripts/build_catalog.py --check
+
+  explorer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Type-check and build
+        working-directory: explorer
+        run: npm ci && npm run build
+      - name: Browser smoke test
+        working-directory: explorer
+        run: npm install --no-save playwright && npx playwright install --with-deps chromium && npm run smoke

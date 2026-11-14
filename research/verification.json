@@ -1,0 +1,334 @@
+{
+ "checked_on": "2026-11-14",
+ "total": 60,
+ "ok": 59,
+ "failed": [
+  "sagas"
+ ],
+ "results": {
+  "a2a-spec": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "anthropic-advanced-tools": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "anthropic-bea": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "anthropic-context": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "anthropic-multiagent": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "anthropic-sandboxing": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "autogen-repo": {
+   "method": "http-get (raw.githubusercontent.com)",
+   "http": 200,
+   "ok": true
+  },
+  "aws-backoff-jitter": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "cemri2025mast": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Why Do Multi-Agent LLM Systems Fail?"
+  },
+  "chen2023frugalgpt": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance"
+  },
+  "chroma-context-rot": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "cognition-multiagents": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "crewai-flows": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "crewai-processes": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "dbos-docs": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "debenedetti2025camel": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Defeating Prompt Injections by Design"
+  },
+  "fourney2024magentic": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Magentic-One: A Generalist Multi-Agent System for Solving Complex Tasks"
+  },
+  "fowler-circuit-breaker": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "gan2025ragmcp": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "RAG-MCP: Mitigating Prompt Bloat in LLM Tool Selection via Retrieval-Augmented Generation"
+  },
+  "greshake2023injection": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection"
+  },
+  "hong2023metagpt": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "MetaGPT: Meta Programming for A Multi-Agent Collaborative Framework"
+  },
+  "jimenez2023swebench": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"
+  },
+  "kim2023llmcompiler": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "An LLM Compiler for Parallel Function Calling"
+  },
+  "langgraph-interrupts": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "langgraph-overview": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "langgraph-persistence": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "li2023camel": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "CAMEL: Communicative Agents for \"Mind\" Exploration of Large Language Model Society"
+  },
+  "liu2023agentbench": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "AgentBench: Evaluating LLMs as Agents"
+  },
+  "macaroons": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "mcp-changelog-2025-11-25": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "mcp-changelog-latest": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "mcp-security": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "mcp-spec": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "mcp-tools": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "mialon2023gaia": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "GAIA: a benchmark for General AI Assistants"
+  },
+  "ms-agent-framework": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "ong2024routellm": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "RouteLLM: Learning to Route LLMs with Preference Data"
+  },
+  "openai-agents-docs": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "openai-agents-guardrails": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "openai-agents-handoffs": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "openai-agents-tracing": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "openai-swarm": {
+   "method": "http-get (raw.githubusercontent.com)",
+   "http": 200,
+   "ok": true
+  },
+  "otel-genai-agent-spans": {
+   "method": "http-get (raw.githubusercontent.com)",
+   "http": 200,
+   "ok": true
+  },
+  "owasp-llm-top10": {
+   "method": "curl",
+   "http": 200,
+   "ok": true
+  },
+  "packer2023memgpt": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "MemGPT: Towards LLMs as Operating Systems"
+  },
+  "park2023generative": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Generative Agents: Interactive Simulacra of Human Behavior"
+  },
+  "qin2023toolllm": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs"
+  },
+  "restate-docs": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "sagas": {
+   "method": "curl",
+   "http": 403,
+   "ok": false
+  },
+  "shinn2023reflexion": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Reflexion: Language Agents with Verbal Reinforcement Learning"
+  },
+  "stripe-idempotency": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "temporal-workflow-execution": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "wang2023plansolve": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models"
+  },
+  "wang2024codeact": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Executable Code Actions Elicit Better LLM Agents"
+  },
+  "willison-trifecta": {
+   "method": "http-get",
+   "http": 200,
+   "ok": true
+  },
+  "wu2023autogen": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation"
+  },
+  "xu2023rewoo": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "ReWOO: Decoupling Reasoning from Observations for Efficient Augmented Language Models"
+  },
+  "yao2022react": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "ReAct: Synergizing Reasoning and Acting in Language Models"
+  },
+  "yao2023tot": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models"
+  },
+  "yao2024taubench": {
+   "method": "arxiv-api",
+   "http": 200,
+   "ok": true,
+   "title_found": "$\u03c4$-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"
+  }
+ }
+}

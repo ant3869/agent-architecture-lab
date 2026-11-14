@@ -1,0 +1,130 @@
+id = "durable-execution"
+order = 3
+title = "Durable execution and checkpointing"
+tagline = "Surviving a process crash mid-task without redoing work or repeating side effects."
+experiment = "durability"
+research = ["langgraph-persistence", "langgraph-interrupts", "temporal-workflow-execution", "restate-docs", "dbos-docs", "stripe-idempotency", "sagas"]
+problem = """
+Agent runs last minutes to hours and call external systems. The process will be restarted mid-run by deploys, crashes and timeouts. Recovery must not lose completed work (re-issuing model calls costs money) and must not repeat a side effect that already happened. The hard case is a crash after a tool applied its effect but before the agent recorded the result.
+"""
+applications = ["Long-running agents on preemptible or autoscaled infrastructure", "Runs that pause for human approval for hours", "Any agent that sends messages, moves money or mutates records"]
+decision = """
+If steps are cheap and idempotent, restarting is fine. Otherwise persist progress: use snapshots when your loop already has an explicit state object (graphs), and a journal when you want durability without touching loop code. In both cases add idempotency keys to every non-idempotent tool; nothing else closes the crash-after-effect window.
+"""
+
+[[solutions]]
+id = "restart"
+name = "Restart from scratch"
+status = "implemented"
+summary = "Persist nothing. After a crash, run the task again."
+implementation = "src/agentlab/durability/crash.py"
+example = "examples/07_durable_execution.py"
+tests = "tests/test_durability.py"
+result_arch = ["restart"]
+diagram = '''
+flowchart LR
+  A[run] -->|crash| B[run again from step 1]
+  B --> C([done])
+  A -.effects already applied.-> W[(world)]
+  B -.effects applied again.-> W
+'''
+advantages = ["Zero infrastructure", "Correct for pure, idempotent, cheap tasks"]
+limitations = ["Repeats every model call and every tool call", "Repeats every non-idempotent effect that happened before the crash"]
+performance = "Measured: {{durability|single crash (exhaustive)|restart|extra_model_calls_mean|1}} re-issued model calls per crash."
+complexity = "None."
+reliability = "Measured over every crash point: {{durability|single crash (exhaustive)|restart|success_rate|%}} correct completion, {{durability|single crash (exhaustive)|restart|duplicate_effects_mean|2}} duplicated effects per run."
+security = "No state at rest."
+use_when = ["Read-only or fully idempotent tasks that are cheap to repeat"]
+avoid_when = ["Anything with non-idempotent side effects", "Expensive runs"]
+frameworks = "Default behaviour of any loop without persistence."
+
+[[solutions]]
+id = "snapshot"
+name = "Snapshot checkpointing"
+status = "implemented"
+summary = "After each step (or graph node) write the whole state under a thread id; on restart load the latest snapshot and continue."
+implementation = "src/agentlab/durability/stores.py"
+example = "examples/06_state_graph.py"
+tests = "tests/test_durability.py"
+result_arch = ["snapshot", "snapshot+idem", "graph_checkpoint", "graph_checkpoint+idem"]
+diagram = '''
+flowchart LR
+  S1[step n] --> C1[(save full state)]
+  C1 --> S2[step n+1]
+  S2 -->|crash before save| L[load last snapshot]
+  L --> S2
+'''
+advantages = ["Simple mental model: state is a value", "Snapshots double as a time-travel and human-in-the-loop mechanism", "No determinism requirement on the code between snapshots"]
+limitations = ["The loop must expose its state (a hook or an explicit state object)", "Writes the whole growing state every time", "The step in flight at the crash is re-executed: at-least-once"]
+performance = "Measured store writes per run: {{durability|single crash (exhaustive)|snapshot|store_bytes_mean|k}} bytes for per-iteration snapshots, {{durability|single crash (exhaustive)|graph_checkpoint|store_bytes_mean|k}} bytes for per-node graph checkpoints, versus {{durability|single crash (exhaustive)|journal|store_bytes_mean|k}} for the journal."
+complexity = "A store ({{complexity|*|snapshot store + journal store|sloc|0}} SLOC shared with the journal) plus a hook in each loop."
+reliability = "Measured over every crash point: {{durability|single crash (exhaustive)|snapshot|success_rate|%}} without idempotency keys, {{durability|single crash (exhaustive)|snapshot+idem|success_rate|%}} with them. The failures are exactly the crashes right after a non-idempotent call."
+security = "Snapshots contain the full transcript, including tool outputs: encrypt at rest and apply the same access control as the data sources."
+use_when = ["The loop is already a state graph", "You also want pause/resume and time travel"]
+avoid_when = ["State is large and steps are frequent", "You cannot modify the loop"]
+integration = """
+```python
+from agentlab.durability.stores import SQLiteCheckpointer
+store = SQLiteCheckpointer("runs.sqlite")
+saved = store.latest(thread_id)
+loop = ReActLoop(rt, on_step=lambda history: store.put(thread_id, {"history": history}))
+loop.run(goal, resume=saved["history"] if saved else None)
+```
+Graph loops take `checkpointer=` directly and resume with `loop.resume()`.
+"""
+frameworks = "LangGraph checkpointers; CrewAI Flow state persistence; OpenAI Agents SDK sessions (history only)."
+
+[[solutions]]
+id = "journal"
+name = "Event-sourced journal with deterministic replay"
+status = "implemented"
+summary = "Record every model response and tool result in an append-only journal. After a crash re-run the same code; recorded results are returned without touching the model or the world."
+implementation = "src/agentlab/durability/journal.py"
+example = "examples/07_durable_execution.py"
+tests = "tests/test_durability.py"
+result_arch = ["journal", "journal+idem"]
+diagram = '''
+flowchart LR
+  A[agent code] -->|call| J{in journal?}
+  J -->|yes| R[return recorded result]
+  J -->|no| I[append intent]
+  I --> X[execute with idempotency key = run:seq]
+  X --> W[append result]
+  W --> A
+  R --> A
+'''
+advantages = ["Wraps any loop without changing it", "Completed model calls are never re-issued", "Append-only writes proportional to new information", "The journal is a complete audit trail"]
+limitations = ["Agent code must be deterministic given recorded results; a code change mid-run can diverge", "Recovery time grows with journal length", "Still at-least-once for the call in flight unless the backend honours idempotency keys"]
+performance = "Measured: {{durability|single crash (exhaustive)|journal|extra_model_calls_mean|2}} re-issued model calls per crash (snapshot: {{durability|single crash (exhaustive)|snapshot|extra_model_calls_mean|2}})."
+complexity = "{{complexity|*|journal replay|sloc|0}} SLOC of wrappers."
+reliability = "Measured over every crash point: {{durability|single crash (exhaustive)|journal|success_rate|%}} without idempotency keys, {{durability|single crash (exhaustive)|journal+idem|success_rate|%}} with them; {{durability|two crashes (sampled)|journal+idem|success_rate|%}} with two crashes in one run. Divergent code is detected and refused, not silently accepted."
+security = "The journal stores every model output and tool result; same handling as snapshots."
+use_when = ["You want durability as a wrapper", "Model calls are the expensive part", "You need an audit trail"]
+avoid_when = ["The loop is non-deterministic in ways you cannot record (wall-clock branches, unrecorded randomness)"]
+integration = """
+```python
+from agentlab.durability.journal import DurableSession
+from agentlab.durability.stores import SQLiteJournal
+session = DurableSession(SQLiteJournal("journal.sqlite"), run_id="run-42")
+rt = Runtime(session.model(model), session.tools(tools))
+ReActLoop(rt).run(goal)      # run the same line again after a crash
+```
+"""
+frameworks = "Temporal, Restate, DBOS, Azure Durable Functions. LangGraph's functional API tasks are the closest analogue inside an agent framework."
+
+[[solutions]]
+id = "idempotency"
+name = "Idempotency keys on side effects (orthogonal, required)"
+status = "implemented"
+summary = "Give every side-effecting call a key derived from the logical operation, so the backend applies it at most once however many times it is sent."
+implementation = "src/agentlab/recovery/policies.py"
+example = "examples/10_failure_recovery.py"
+tests = "tests/test_recovery.py"
+result_arch = ["snapshot+idem", "graph_checkpoint+idem", "journal+idem"]
+advantages = ["Turns at-least-once delivery into effectively-once effects", "Works with every persistence strategy and with retries"]
+limitations = ["The backend must support it", "The key must identify the operation, not the attempt"]
+reliability = "Measured over every crash point: snapshots went from {{durability|single crash (exhaustive)|snapshot|success_rate|%}} to {{durability|single crash (exhaustive)|snapshot+idem|success_rate|%}} correct completion, graph checkpoints from {{durability|single crash (exhaustive)|graph_checkpoint|success_rate|%}} to {{durability|single crash (exhaustive)|graph_checkpoint+idem|success_rate|%}}, the journal from {{durability|single crash (exhaustive)|journal|success_rate|%}} to {{durability|single crash (exhaustive)|journal+idem|success_rate|%}}. With two crashes in one run: {{durability|two crashes (sampled)|snapshot+idem|success_rate|%}} and {{durability|two crashes (sampled)|journal+idem|success_rate|%}}."
+security = "Derive keys from the run and the logical step, not from user-controlled text, so one caller cannot suppress another's operation."
+use_when = ["Always, for non-idempotent tools"]
+avoid_when = ["Never; if the backend has no keys, add a read-back check before retrying"]
+frameworks = "Stripe-style Idempotency-Key headers; Temporal activity ids."

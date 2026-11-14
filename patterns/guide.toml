@@ -1,0 +1,115 @@
+# Decision guide: engineering problem -> recommended pattern.
+# `recommendation` is advice. `evidence` is measured in this repository (numbers are bound to experiments/results).
+# Rendered to docs/decision-guide.md and the explorer's Guide view by scripts/build_catalog.py.
+
+[[entry]]
+problem = "A short tool-using task, mistakes are cheap or tools report them"
+pattern = "execution-loops"
+solution = "react"
+recommendation = "Use a plain ReAct loop. Add nothing until a measured problem appears."
+evidence = "All three loops completed 100% of clean 15-step tasks; ReAct is the smallest ({{complexity|*|react|sloc|0}} SLOC)."
+
+[[entry]]
+problem = "A predictable multi-step task where token cost or latency matters"
+pattern = "execution-loops"
+solution = "plan_execute"
+recommendation = "Plan once with symbolic references and execute in code; replan only on failure."
+evidence = "{{loops|clean|plan_execute|total_tokens_mean|k}} tokens versus {{loops|clean|react|total_tokens_mean|k}} for ReAct on the same tasks, with identical success."
+
+[[entry]]
+problem = "The task ends in an irreversible action and the model sometimes makes plausible but wrong calls"
+pattern = "execution-loops"
+solution = "verified_graph"
+recommendation = "Use an explicit graph that verifies before every side effect. Put the cheapest reliable check you have in the verifier."
+evidence = "With 8% injected slips (half silent): {{loops|noisy|verified_graph|success_rate|%}} success versus {{loops|noisy|react|success_rate|%}} for ReAct and plan-and-execute."
+
+[[entry]]
+problem = "The work is long but splits into independent parts that can each be briefed in a few lines"
+pattern = "orchestration"
+solution = "supervisor"
+recommendation = "Use a supervisor with context-isolated specialist workers, and give each worker only its own tools."
+evidence = "At 57 steps: {{orchestration|no fault, 8 stages (57 steps)|supervisor, 1 worker/skill|total_tokens_mean|k}} tokens versus {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|total_tokens_mean|k}} single-agent; makespan {{orchestration|no fault, 8 stages (57 steps)|supervisor, 3 workers/skill|makespan_ms_mean|s}}s with three workers per skill versus {{orchestration|no fault, 8 stages (57 steps)|single agent (react)|makespan_ms_mean|s}}s."
+
+[[entry]]
+problem = "One conversation needs to move between specialists and must not lose context at the boundary"
+pattern = "orchestration"
+solution = "handoff"
+recommendation = "Use handoffs, keep the number of boundaries small, and persist the handoff envelope if a lost conversation is unacceptable."
+evidence = "Handoff cost {{orchestration|no fault, 8 stages (57 steps)|peer handoff|total_tokens_mean|k}} tokens at 57 steps. After an agent crash a plain chain completed {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|peer handoff|success_rate|%}} of runs; with a durable baton, a replica and idempotency keys, {{orchestration|ops agent dies right after its k-th tool call, k in 1..4 (4 stages, per-stage notifications)|peer handoff, durable baton + replica + idem|success_rate|%}}."
+
+[[entry]]
+problem = "Considering multiple agents for a short or tightly coupled task"
+pattern = "orchestration"
+solution = "single"
+recommendation = "Do not split. Coordination adds model calls and every boundary can drop information."
+evidence = "At 15 steps the supervisor made {{orchestration|no fault, 2 stages (15 steps)|supervisor, 1 worker/skill|model_calls_mean|0}} model calls against {{orchestration|no fault, 2 stages (15 steps)|single agent (react)|model_calls_mean|0}} for one agent."
+
+[[entry]]
+problem = "The agent process can crash or be redeployed mid-run"
+pattern = "durable-execution"
+solution = "journal"
+recommendation = "Wrap the model and tools in a journal and re-run the same code on restart. Use snapshots instead if your loop is already a state graph."
+evidence = "Journal recovery re-issued {{durability|single crash (exhaustive)|journal|extra_model_calls_mean|2}} model calls per crash; restarting re-issued {{durability|single crash (exhaustive)|restart|extra_model_calls_mean|1}}."
+
+[[entry]]
+problem = "A tool call must not happen twice (payments, messages, tickets)"
+pattern = "durable-execution"
+solution = "idempotency"
+recommendation = "Attach an idempotency key derived from the logical operation to every side-effecting call. No persistence strategy removes this need."
+evidence = "Across every crash point, snapshots and the journal completed {{durability|single crash (exhaustive)|journal|success_rate|%}} correctly without keys and {{durability|single crash (exhaustive)|journal+idem|success_rate|%}} with them."
+
+[[entry]]
+problem = "Tools fail transiently"
+pattern = "failure-recovery"
+solution = "backoff"
+recommendation = "Retry in the runtime with bounded, jittered backoff. Send only semantic errors to the model."
+evidence = "Under 30% transient faults: {{recovery|transient 30%|backoff|total_tokens_mean|k}} tokens per task with runtime backoff, {{recovery|transient 30%|model-mediated|total_tokens_mean|k}} when the model retried."
+
+[[entry]]
+problem = "A dependency can be down for minutes"
+pattern = "failure-recovery"
+solution = "breaker"
+recommendation = "Add a circuit breaker and, where one exists, a fallback."
+evidence = "Through a 58s outage: {{recovery|outage 58s|breaker+fallback|sim_ms_mean|s}}s with breaker and replica, {{recovery|outage 58s|backoff|sim_ms_mean|s}}s with backoff alone."
+
+[[entry]]
+problem = "Runs are long and the context window or token bill is the constraint"
+pattern = "context-memory"
+solution = "ledger"
+recommendation = "Keep task state in a structured ledger outside the transcript when tool outputs are structured; otherwise compact. Avoid bare sliding windows for tasks with long-range dependencies."
+evidence = "At 57 steps: ledger {{memory|57 steps|ledger|total_tokens_mean|k}} tokens, compaction {{memory|57 steps|compaction-600|total_tokens_mean|k}}, full history {{memory|57 steps|full|total_tokens_mean|k}}; a 6-message window completed {{memory|57 steps|window-6|success_rate|%}}."
+
+[[entry]]
+problem = "The agent has access to dozens of tools"
+pattern = "tool-registry"
+solution = "scoped"
+recommendation = "Scope by capability when the task type is known, load lazily when it is not, and validate arguments before execution either way."
+evidence = "39-tool catalogue: {{tools|perfect model|static|prompt_tokens_mean|k}} prompt tokens per task static, {{tools|perfect model|scoped|prompt_tokens_mean|k}} scoped, {{tools|perfect model|lazy|prompt_tokens_mean|k}} lazy."
+
+[[entry]]
+problem = "Strong-model quality is needed but its cost on every call is not affordable"
+pattern = "model-routing"
+solution = "cascade"
+recommendation = "Cascade from a cheap model and escalate on failure signals, which requires a loop that produces such signals (verification, loud tool errors)."
+evidence = "Verified graph: cascade {{routing|verified_graph|cascade (escalate on failure)|success_rate|%}} at cost {{routing|verified_graph|cascade (escalate on failure)|cost_mean|1}}, all-large {{routing|verified_graph|all-large|success_rate|%}} at {{routing|verified_graph|all-large|cost_mean|1}}. On ReAct the cascade reached {{routing|react|cascade (escalate on failure)|success_rate|%}}, all-small {{routing|react|all-small|success_rate|%}}."
+
+[[entry]]
+problem = "The agent reads untrusted content and can send or write"
+pattern = "permissions"
+solution = "capability"
+recommendation = "Constrain arguments, not just tool names, with a capability token; add human approval only for what policy cannot express."
+evidence = "Injected exfiltration executed in {{permissions|model always obeys injected text|allowlist (tool names)|exfil_mean|%}} of runs under a tool allowlist and {{permissions|model always obeys injected text|capability token (argument-scoped)|exfil_mean|%}} under an argument-scoped token."
+
+[[entry]]
+problem = "Some actions need a human decision"
+pattern = "permissions"
+solution = "approval"
+recommendation = "Gate by risk tier with interrupt and resume so a run can wait hours, and keep request volume low."
+evidence = "Exfiltration with an attentive reviewer: {{permissions|model always obeys injected text|approval, attentive reviewer|exfil_mean|%}}, at {{permissions|model always obeys injected text|approval, attentive reviewer|approvals_mean|1}} requests per task. With a reviewer who approved everything: {{permissions|model always obeys injected text|approval, rubber-stamp reviewer|exfil_mean|%}}."
+
+[[entry]]
+problem = "A failed run needs to be explained or reproduced"
+pattern = "tracing-replay"
+solution = "replay"
+recommendation = "Emit one event stream at the model/tool choke point; derive spans for your tracing backend and a tape for deterministic replay."
+evidence = "Replay reproduced the complete event stream in {{tracing|*|react|replay_identical|%}} of recorded runs for all three loops."

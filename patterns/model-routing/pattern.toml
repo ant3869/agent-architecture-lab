@@ -1,0 +1,92 @@
+id = "model-routing"
+order = 7
+title = "Model selection and routing"
+tagline = "Which model answers which call."
+experiment = "routing"
+research = ["chen2023frugalgpt", "ong2024routellm"]
+problem = """
+Strong models cost several times more than small ones and most calls in an agent run are easy. Routing every call to the strong model wastes money; routing every call to the small one loses reliability. A router needs a signal that says which calls deserve the strong model, and the architecture determines whether such a signal exists.
+"""
+applications = ["High-volume agents with cost targets", "Planner/executor splits", "Worker agents under a stronger lead"]
+decision = """
+Routing needs a failure signal. If your loop has verification, cascade: run cheap, escalate when verification or a tool error says so. If roles differ in leverage, route by role. Without either, a router can only guess, and a static choice is the honest baseline.
+"""
+
+[[solutions]]
+id = "static"
+name = "Static model"
+status = "implemented"
+summary = "One model for every call."
+implementation = "src/agentlab/routing/router.py"
+example = "examples/12_model_routing.py"
+tests = "tests/test_routing.py"
+result_arch = ["all-small", "all-large"]
+advantages = ["Predictable behaviour and cost", "One prompt cache"]
+limitations = ["Overpays on easy calls or underperforms on hard ones"]
+performance = "Measured on the verified graph: all-large {{routing|verified_graph|all-large|success_rate|%}} success at cost {{routing|verified_graph|all-large|cost_mean|1}}; all-small {{routing|verified_graph|all-small|success_rate|%}} at {{routing|verified_graph|all-small|cost_mean|1}}."
+use_when = ["Starting out", "Quality-critical work with no verifier"]
+avoid_when = ["Cost matters and a failure signal is available"]
+frameworks = "Default."
+
+[[solutions]]
+id = "role"
+name = "Role-based routing"
+status = "implemented"
+summary = "Strong model for rare, high-leverage calls (plan, verify); cheap model for frequent ones (act)."
+implementation = "src/agentlab/routing/router.py"
+example = "examples/12_model_routing.py"
+tests = "tests/test_routing.py"
+result_arch = ["role (plan/verify large)"]
+diagram = '''
+flowchart LR
+  Q[Request] --> R{mode}
+  R -->|plan, replan, verify| L[Strong model]
+  R -->|act, finalize| S[Cheap model]
+'''
+advantages = ["Static and predictable", "No failure detector needed"]
+limitations = ["Useless when all calls have the same role (ReAct)", "If the high-leverage calls are also the long ones, savings are small"]
+performance = "Measured on the verified graph: {{routing|verified_graph|role (plan/verify large)|success_rate|%}} success at cost {{routing|verified_graph|role (plan/verify large)|cost_mean|1}} (all-large: {{routing|verified_graph|all-large|cost_mean|1}})."
+use_when = ["Loops with distinct planner / verifier / executor roles", "Supervisor with cheaper workers"]
+avoid_when = ["Single-role loops"]
+frameworks = "Lead/sub-agent model splits; CrewAI manager_llm; advisor patterns."
+
+[[solutions]]
+id = "cascade"
+name = "Cascade (escalate on evidence of failure)"
+status = "implemented"
+summary = "Run on the cheap model; switch to the strong model for a call when the latest context shows a failed tool call or a verifier rejection."
+implementation = "src/agentlab/routing/router.py"
+example = "examples/12_model_routing.py"
+tests = "tests/test_routing.py"
+result_arch = ["cascade (escalate on failure)", "cascade, small verifier"]
+diagram = '''
+flowchart LR
+  Q[Request] --> F{last message a failure?}
+  F -->|no| S[Cheap model]
+  F -->|yes| L[Strong model]
+  V[verify calls] --> L
+'''
+advantages = ["Pays for the strong model only where there is evidence it is needed", "Composes with any loop: it is just a Model"]
+limitations = ["Only as good as the failure signal: silent errors never escalate", "Mixed models split prompt caches", "Behaviour differs between the easy and hard path, which complicates testing"]
+performance = "Measured on the verified graph: {{routing|verified_graph|cascade (escalate on failure)|success_rate|%}} at cost {{routing|verified_graph|cascade (escalate on failure)|cost_mean|1}}; with the verifier also on the cheap model {{routing|verified_graph|cascade, small verifier|success_rate|%}} at {{routing|verified_graph|cascade, small verifier|cost_mean|1}}. On ReAct, which has no verifier, the cascade reached {{routing|react|cascade (escalate on failure)|success_rate|%}} against {{routing|react|all-small|success_rate|%}} all-small."
+reliability = "Inherits the verifier's miss rate."
+use_when = ["A verifier or loud tool errors exist", "Most calls are easy"]
+avoid_when = ["No failure signal", "Errors are mostly silent and unverified"]
+integration = """
+```python
+from agentlab.routing.router import CascadeRouter, RoutedModel
+model = RoutedModel({"small": small, "large": large}, CascadeRouter("large", "small"))
+```
+"""
+frameworks = "FrugalGPT; fallback-on-error model chains."
+
+[[solutions]]
+id = "learned"
+name = "Learned router"
+status = "documented"
+summary = "Train a classifier on preference or outcome data to predict which model a query needs before answering it."
+advantages = ["Routes before spending anything", "Can beat heuristics where data exists"]
+limitations = ["Needs labelled data from your own traffic", "Drifts as models and tasks change"]
+use_when = ["High volume with outcome labels"]
+avoid_when = ["Low volume or no labels"]
+frameworks = "RouteLLM. Not implemented here: the simulator has no query features to learn from."
