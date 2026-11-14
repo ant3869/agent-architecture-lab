@@ -39,6 +39,8 @@ npm run build
 
 ## Verify it
 
+The browser smoke runner starts the installed Vite preview CLI through Node directly, so the same command works in PowerShell on Windows and in Linux/macOS shells.
+
 Type-check and build:
 
 ```bash
