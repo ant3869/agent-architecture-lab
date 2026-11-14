@@ -46,7 +46,9 @@ async function waitForServer() {
   throw new Error("vite preview did not start");
 }
 
-const server = spawn("npx", ["vite", "preview", "--port", String(port), "--strictPort", "--host", "127.0.0.1"], { cwd: root, stdio: "ignore" });
+// Run the installed Vite CLI with Node directly; spawning npx fails on Windows without a shell.
+const viteCli = join(root, "node_modules", "vite", "bin", "vite.js");
+const server = spawn(process.execPath, [viteCli, "preview", "--port", String(port), "--strictPort", "--host", "127.0.0.1"], { cwd: root, stdio: "ignore" });
 const problems = [];
 let browser;
 try {
