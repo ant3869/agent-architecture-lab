@@ -30,7 +30,10 @@ jobs:
         run: python scripts/build_catalog.py --check
 
   explorer:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,6 +42,14 @@ jobs:
       - name: Type-check and build
         working-directory: explorer
         run: npm ci && npm run build
+      - name: Install Playwright and Chromium (Linux)
+        if: runner.os == 'Linux'
+        working-directory: explorer
+        run: npm install --no-save playwright && npx playwright install --with-deps chromium
+      - name: Install Playwright and Chromium (Windows)
+        if: runner.os == 'Windows'
+        working-directory: explorer
+        run: npm install --no-save playwright && npx playwright install chromium
       - name: Browser smoke test
         working-directory: explorer
-        run: npm install --no-save playwright && npx playwright install --with-deps chromium && npm run smoke
+        run: npm run smoke
